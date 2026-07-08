@@ -1,0 +1,31 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isAuth() { return request.auth != null; }
+    function isOwner(uid) { return request.auth.uid == uid; }
+    function isAdmin() { return request.auth.token.role == 'admin'; }
+    function isImage() { return request.resource.contentType.matches('image/.*'); }
+    function isSmallFile() { return request.resource.size < 5 * 1024 * 1024; }
+
+    // User avatars — owner or admin only
+    match /avatars/{uid}/{fileName} {
+      allow read:   if true;
+      allow write:  if isAuth() && isOwner(uid) && isImage() && isSmallFile();
+      allow delete: if isAuth() && (isOwner(uid) || isAdmin());
+    }
+
+    // Team crests — admin only
+    match /teams/{teamId}/{fileName} {
+      allow read:  if true;
+      allow write: if isAdmin() && isImage() && isSmallFile();
+    }
+
+    // League logos — admin only
+    match /leagues/{leagueId}/{fileName} {
+      allow read:  if true;
+      allow write: if isAdmin() && isImage() && isSmallFile();
+    }
+  }
+}
