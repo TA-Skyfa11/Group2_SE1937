@@ -350,6 +350,126 @@ async function refreshFeaturedMatches() {
   }
 }
 
+// ─── Settle predictions cho các trận đã kết thúc ──────────────────────────
+//
+// Đây là mảnh còn thiếu trong toàn bộ hệ thống: mapMatchForUpsert() chỉ đặt
+// `isSettled: true` trên MATCH khi trận đấu FINISHED, nhưng trước đây không
+// có bất kỳ đoạn code nào đi tìm các PREDICTION đang "PENDING" của trận đó
+// để tính thắng/thua, cộng/trừ coin, cập nhật thống kê. Vì vậy dự đoán của
+// người dùng bị kẹt ở "Chờ kết quả" mãi mãi dù trận đã đá xong từ lâu.
+
+function computeOutcome(score) {
+  const h = score.fullTime.home;
+  const a = score.fullTime.away;
+  if (h === null || a === null) return null;
+  if (h > a) return "HOME_WIN";
+  if (a > h) return "AWAY_WIN";
+  return "DRAW";
+}
+
+async function settlePendingPredictionsForMatch(matchId, matchData) {
+  const actualOutcome = computeOutcome(matchData.score);
+  if (!actualOutcome) return 0; // chưa có tỷ số hợp lệ, bỏ qua
+
+  const pendingSnap = await db
+    .collection("predictions")
+    .where("matchId", "==", matchId)
+    .where("status", "==", "PENDING")
+    .get();
+
+  if (pendingSnap.empty) return 0;
+
+  let settledCount = 0;
+
+  for (const predDoc of pendingSnap.docs) {
+    const prediction = predDoc.data();
+    const won = prediction.outcome === actualOutcome;
+    const actualPayout = won ? prediction.potentialPayout : 0;
+    const now = admin.firestore.Timestamp.now();
+    const userRef = db.collection("users").doc(prediction.userId);
+
+    try {
+      await db.runTransaction(async (txn) => {
+        const userSnap = await txn.get(userRef);
+        if (!userSnap.exists) return; // tài khoản đã bị xoá, bỏ qua an toàn
+        const u = userSnap.data();
+
+        const newCorrect = (u.correctPredictions ?? 0) + (won ? 1 : 0);
+        const newTotalPredictions = u.totalPredictions ?? 0; // đã +1 lúc đặt cược
+        const newStreak = won ? (u.currentStreak ?? 0) + 1 : 0;
+        const newBestStreak = Math.max(u.bestStreak ?? 0, newStreak);
+        const newWinRate = newTotalPredictions > 0 ? newCorrect / newTotalPredictions : 0;
+
+        txn.update(userRef, {
+          coinBalance: won ? admin.firestore.FieldValue.increment(actualPayout) : u.coinBalance,
+          totalEarned: won
+            ? admin.firestore.FieldValue.increment(actualPayout)
+            : u.totalEarned,
+          totalLost: won ? u.totalLost : admin.firestore.FieldValue.increment(prediction.amount),
+          correctPredictions: newCorrect,
+          currentStreak: newStreak,
+          bestStreak: newBestStreak,
+          winRate: newWinRate,
+          updatedAt: now,
+        });
+
+        const predUpdate = {
+          status: won ? "WON" : "LOST",
+          actualPayout,
+          settledAt: now,
+        };
+        txn.update(predDoc.ref, predUpdate);
+        // Giữ đồng bộ bản sao trong users/{uid}/predictions/{id} (app đọc
+        // lịch sử cá nhân từ đây ở một vài màn hình).
+        txn.update(
+          db.collection("users").doc(prediction.userId).collection("predictions").doc(predDoc.id),
+          predUpdate
+        );
+
+        if (won) {
+          const txRef = db
+            .collection("users")
+            .doc(prediction.userId)
+            .collection("transactions")
+            .doc(`settle-${predDoc.id}`);
+          txn.set(txRef, {
+            type: "BET_WON",
+            amount: actualPayout,
+            balanceAfter: (u.coinBalance ?? 0) + actualPayout,
+            reference: predDoc.id,
+            description: `Thắng dự đoán — ${prediction.matchSnapshot?.homeTeam?.name ?? ""} - ${prediction.matchSnapshot?.awayTeam?.name ?? ""}`,
+            createdAt: now,
+          });
+        }
+      });
+      settledCount++;
+    } catch (err) {
+      console.error(`  ✗ Lỗi settle prediction ${predDoc.id}:`, err.message);
+    }
+  }
+
+  return settledCount;
+}
+
+async function settlePredictions() {
+  console.log("\n=== Xử lý kết quả dự đoán (settle) ===");
+  const finishedSnap = await db
+    .collection("matches")
+    .where("isSettled", "==", true)
+    .limit(200)
+    .get();
+
+  let total = 0;
+  for (const matchDoc of finishedSnap.docs) {
+    const count = await settlePendingPredictionsForMatch(matchDoc.id, matchDoc.data());
+    if (count > 0) {
+      console.log(`  ✓ ${matchDoc.id}: đã xử lý ${count} dự đoán`);
+      total += count;
+    }
+  }
+  console.log(total > 0 ? `  → Tổng cộng: ${total} dự đoán đã có kết quả.` : "  (không có dự đoán nào cần xử lý)");
+}
+
 // ─── Main ────────────────────────────────────────────────────────────────
 
 async function main() {
@@ -362,6 +482,7 @@ async function main() {
   if (job === "matches" || job === "all") {
     await syncMatches();
     await refreshFeaturedMatches();
+    await settlePredictions();
   }
 
   console.log("\n✅ Hoàn tất.");

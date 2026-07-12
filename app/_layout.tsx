@@ -6,7 +6,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { ToastContainer } from "../components/ui/Toast";
-import { useAuth } from "../hooks/useAuth";
+import { useAuthListener } from "../hooks/useAuth";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,13 +21,10 @@ const queryClient = new QueryClient({
 export default function RootLayout() {
   // Mounts the Firebase onAuthStateChanged listener ONCE for the whole
   // app, right at startup, regardless of which screen the user lands on
-  // first. Without this, `useAuthStore.isLoading` (which starts as
-  // `true` and is only ever set to `false` inside useAuth()'s effect)
-  // would stay stuck at `true` forever whenever no other mounted screen
-  // happens to call useAuth() — which is exactly what made "Dự đoán" and
-  // "Cá nhân" spin their RoleGuard loading indicator forever for a Guest
-  // who never visits the Login screen.
-  useAuth();
+  // first. This must be useAuthListener(), NOT useAuth() — useAuth() is
+  // a plain state reader now and is safe to call from any number of
+  // screens (Predictions, Profile, ...) without re-triggering this setup.
+  useAuthListener();
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

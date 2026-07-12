@@ -1,24 +1,13 @@
-import { useEffect } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "../store/authStore";
-import { userService } from "../services/userService";
-import { QUERY_KEYS } from "../constants/queryKeys";
 
+// coinBalance/totalEarned/totalLost are already kept live by the single
+// global profile listener in useAuthListener() (mounted once at the app
+// root) — no need for a second onSnapshot listener on the same document
+// here. Reading straight from the store avoids duplicate Firestore
+// listeners (extra battery/network use) and an extra place this data
+// could ever get out of sync.
 export function useCoins() {
-  const { firebaseUser, user, updateCoinBalance } = useAuthStore();
-  const queryClient = useQueryClient();
-
-  useEffect(() => {
-    if (!firebaseUser?.uid) return;
-    const unsub = userService.subscribeToUser(firebaseUser.uid, (profile) => {
-      updateCoinBalance(profile.coinBalance);
-      queryClient.setQueryData(
-        QUERY_KEYS.user.profile(firebaseUser.uid),
-        profile
-      );
-    });
-    return unsub;
-  }, [firebaseUser?.uid]);
+  const { user } = useAuthStore();
 
   return {
     balance: user?.coinBalance ?? 0,

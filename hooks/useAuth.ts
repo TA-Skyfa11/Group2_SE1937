@@ -18,18 +18,22 @@ import type { Unsubscribe } from "firebase/firestore";
 const USE_MOCK = !process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID ||
   process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID === "demo-project";
 
-export function useAuth() {
-  const {
-    user,
-    firebaseUser,
-    isLoading,
-    isAuthenticated,
-    role,
-    setFirebaseUser,
-    setUserProfile,
-    setLoading,
-    logout: storeLogout,
-  } = useAuthStore();
+// This effect must run EXACTLY ONCE for the whole app — call it only from
+// the root layout (app/_layout.tsx), never from individual screens.
+//
+// Why this has to be a separate hook from useAuth(): every component that
+// previously called useAuth() re-ran this same onAuthStateChanged +
+// onSnapshot setup as its OWN separate effect instance, all writing to the
+// same global Zustand store. Opening "Cá nhân" (which calls useAuth())
+// would immediately flip the shared `isLoading` back to `true` again via
+// this effect's own `setLoading(true)`. If the user navigated away before
+// THAT particular instance's first profile snapshot arrived, its cleanup
+// function unsubscribed the listener without ever calling `setLoading
+// (false)` again — leaving the whole app's `isLoading` stuck at `true`
+// forever, which is exactly why RoleGuard (shared by "Dự đoán" and "Cá
+// nhân") got stuck showing its loading spinner on BOTH tabs after that.
+export function useAuthListener() {
+  const { setFirebaseUser, setUserProfile, setLoading } = useAuthStore();
 
   useEffect(() => {
     if (USE_MOCK) {
@@ -76,10 +80,7 @@ export function useAuth() {
             // Only the FIRST snapshot should resolve the app-wide loading
             // state — this guarantees `role` is already correct (not
             // just `isAuthenticated`) by the time any screen reads
-            // `isLoading === false`, closing the race where a screen
-            // gated on requiredRole="user" would briefly (or, for an
-            // orphaned account, permanently) see role still at its
-            // "guest" default right after login.
+            // `isLoading === false`.
             if (!gotFirstSnapshot) {
               gotFirstSnapshot = true;
               setLoading(false);
@@ -105,7 +106,26 @@ export function useAuth() {
       unsubAuth();
       unsubProfile?.();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+}
+
+// Safe to call from as many components as needed — this is a PURE reader
+// of the global auth store plus a few stable action callbacks. It sets up
+// no listeners and no effects of its own, so calling it from "Dự đoán",
+// "Cá nhân", or anywhere else can never disturb the app-wide loading/auth
+// state that useAuthListener() (mounted once, at the root) owns.
+export function useAuth() {
+  const {
+    user,
+    firebaseUser,
+    isLoading,
+    isAuthenticated,
+    role,
+    setFirebaseUser,
+    setUserProfile,
+    logout: storeLogout,
+  } = useAuthStore();
 
   const login = useCallback(async (credentials: LoginCredentials) => {
     if (USE_MOCK) {

@@ -4,7 +4,7 @@ const admin = require("firebase-admin");
 const serviceAccount = require("C:/Users/Administrator/Downloads/group2-se1937-firebase-adminsdk-fbsvc-5397f6c5ca.json");
 
 // Email tài khoản cần cấp quyền admin
-const email = "admin@example.com";
+const email = "admin@gmail.com";
 // =======================
 
 admin.initializeApp({
