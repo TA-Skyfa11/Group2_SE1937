@@ -37,12 +37,12 @@ export const matchService = {
         where("isFeatured", "==", true),
         where("status", "in", ["SCHEDULED", "LIVE"]),
         orderBy("utcDate", "asc"),
-        limit(10)
+        limit(20)
       )
     );
   },
 
-  getUpcomingMatches: async (limitCount = 20): Promise<Match[]> => {
+  getUpcomingMatches: async (limitCount = 50): Promise<Match[]> => {
     if (USE_MOCK) return MOCK_MATCHES.filter((m) => m.status === "SCHEDULED");
     return firestoreQuery<Match>(
       query(
@@ -54,7 +54,7 @@ export const matchService = {
     );
   },
 
-  getMatchesByLeague: async (leagueId: string, limitCount = 20): Promise<Match[]> => {
+  getMatchesByLeague: async (leagueId: string, limitCount = 50): Promise<Match[]> => {
     if (USE_MOCK) return MOCK_MATCHES.filter((m) => m.leagueId === leagueId);
     return firestoreQuery<Match>(
       query(

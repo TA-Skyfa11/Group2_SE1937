@@ -38,18 +38,18 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#0a0a0a" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#f7f8fb" }}>
       <ScrollView style={{ flex: 1 }}>
         {/* Header */}
         <View style={{ padding: 16, paddingTop: 20, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
           <View>
-            <Text style={{ color: "#fff", fontSize: 24, fontWeight: "700" }}>Trang quản trị</Text>
-            <Text style={{ color: "#737373", fontSize: 13, marginTop: 2 }}>
+            <Text style={{ color: "#0f172a", fontSize: 24, fontWeight: "700" }}>Trang quản trị</Text>
+            <Text style={{ color: "#64748b", fontSize: 13, marginTop: 2 }}>
               Chào, {user?.displayName}
             </Text>
           </View>
           <TouchableOpacity onPress={() => router.back()}>
-            <Text style={{ color: "#737373", fontSize: 15 }}>← Quay lại</Text>
+            <Text style={{ color: "#64748b", fontSize: 15 }}>← Quay lại</Text>
           </TouchableOpacity>
         </View>
 
@@ -58,7 +58,7 @@ export default function AdminDashboard() {
           <Text style={{ fontSize: 20 }}>⚙️</Text>
           <View>
             <Text style={{ color: "#14b8a6", fontWeight: "600", fontSize: 14 }}>Đã bật quyền quản trị</Text>
-            <Text style={{ color: "#737373", fontSize: 12, marginTop: 2 }}>
+            <Text style={{ color: "#64748b", fontSize: 12, marginTop: 2 }}>
               Bạn có toàn quyền kiểm soát hệ thống
             </Text>
           </View>
@@ -66,7 +66,7 @@ export default function AdminDashboard() {
 
         {/* Stats grid */}
         <View style={{ paddingHorizontal: 16, marginBottom: 24 }}>
-          <Text style={{ color: "#fff", fontSize: 17, fontWeight: "700", marginBottom: 12 }}>
+          <Text style={{ color: "#0f172a", fontSize: 17, fontWeight: "700", marginBottom: 12 }}>
             Tổng quan hệ thống
           </Text>
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
@@ -74,14 +74,14 @@ export default function AdminDashboard() {
               <View
                 key={label}
                 style={{
-                  width: "47%", backgroundColor: "#171717",
-                  borderWidth: 1, borderColor: "#262626",
+                  width: "47%", backgroundColor: "#ffffff",
+                  borderWidth: 1, borderColor: "#e7e9ee",
                   borderRadius: 14, padding: 16,
                 }}
               >
                 <Text style={{ fontSize: 24, marginBottom: 8 }}>{icon}</Text>
-                <Text style={{ color: "#fff", fontSize: 22, fontWeight: "700" }}>{value}</Text>
-                <Text style={{ color: "#737373", fontSize: 12, marginTop: 4 }}>{label}</Text>
+                <Text style={{ color: "#0f172a", fontSize: 22, fontWeight: "700" }}>{value}</Text>
+                <Text style={{ color: "#64748b", fontSize: 12, marginTop: 4 }}>{label}</Text>
               </View>
             ))}
           </View>
@@ -89,19 +89,19 @@ export default function AdminDashboard() {
 
         {/* Recent matches */}
         <View style={{ paddingHorizontal: 16, marginBottom: 24 }}>
-          <Text style={{ color: "#fff", fontSize: 17, fontWeight: "700", marginBottom: 12 }}>
+          <Text style={{ color: "#0f172a", fontSize: 17, fontWeight: "700", marginBottom: 12 }}>
             Trận đấu gần đây
           </Text>
           {MOCK_MATCHES.map((match) => (
             <View
               key={match.id}
               style={{
-                backgroundColor: "#171717", borderWidth: 1, borderColor: "#262626",
+                backgroundColor: "#ffffff", borderWidth: 1, borderColor: "#e7e9ee",
                 borderRadius: 12, padding: 14, marginBottom: 8,
               }}
             >
               <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 6 }}>
-                <Text style={{ color: "#737373", fontSize: 11 }}>{match.leagueName}</Text>
+                <Text style={{ color: "#64748b", fontSize: 11 }}>{match.leagueName}</Text>
                 <View style={{
                   backgroundColor: match.status === "LIVE" ? "rgba(239,68,68,0.15)" :
                     match.status === "FINISHED" ? "rgba(115,115,115,0.15)" : "rgba(20,184,166,0.15)",
@@ -110,20 +110,20 @@ export default function AdminDashboard() {
                   <Text style={{
                     fontSize: 11, fontWeight: "600",
                     color: match.status === "LIVE" ? "#ef4444" :
-                      match.status === "FINISHED" ? "#737373" : "#14b8a6",
+                      match.status === "FINISHED" ? "#64748b" : "#14b8a6",
                   }}>
                     {STATUS_LABEL[match.status] ?? match.status}
                   </Text>
                 </View>
               </View>
-              <Text style={{ color: "#fff", fontSize: 14, fontWeight: "600" }}>
-                {match.homeTeam.name} vs {match.awayTeam.name}
+              <Text style={{ color: "#0f172a", fontSize: 14, fontWeight: "600" }}>
+                {match.homeTeam.name} - {match.awayTeam.name}
               </Text>
               <View style={{ flexDirection: "row", gap: 16, marginTop: 8 }}>
-                <Text style={{ color: "#737373", fontSize: 12 }}>
+                <Text style={{ color: "#64748b", fontSize: 12 }}>
                   🎯 {match.predictionStats.totalBets} dự đoán
                 </Text>
-                <Text style={{ color: "#737373", fontSize: 12 }}>
+                <Text style={{ color: "#64748b", fontSize: 12 }}>
                   🪙 {match.predictionStats.totalCoinsWagered.toLocaleString()} coin đã cược
                 </Text>
               </View>
@@ -133,7 +133,7 @@ export default function AdminDashboard() {
 
         {/* Quick actions */}
         <View style={{ paddingHorizontal: 16, marginBottom: 48 }}>
-          <Text style={{ color: "#fff", fontSize: 17, fontWeight: "700", marginBottom: 12 }}>
+          <Text style={{ color: "#0f172a", fontSize: 17, fontWeight: "700", marginBottom: 12 }}>
             Thao tác nhanh
           </Text>
           {actions.map(({ label, icon, route }) => (
@@ -141,14 +141,14 @@ export default function AdminDashboard() {
               key={label}
               onPress={() => router.push(route as any)}
               style={{
-                backgroundColor: "#171717", borderWidth: 1, borderColor: "#262626",
+                backgroundColor: "#ffffff", borderWidth: 1, borderColor: "#e7e9ee",
                 borderRadius: 14, padding: 16, marginBottom: 8,
                 flexDirection: "row", alignItems: "center",
               }}
             >
               <Text style={{ fontSize: 22, marginRight: 14 }}>{icon}</Text>
-              <Text style={{ color: "#fff", flex: 1, fontSize: 15, fontWeight: "500" }}>{label}</Text>
-              <Text style={{ color: "#404040", fontSize: 20 }}>›</Text>
+              <Text style={{ color: "#0f172a", flex: 1, fontSize: 15, fontWeight: "500" }}>{label}</Text>
+              <Text style={{ color: "#cbd5e1", fontSize: 20 }}>›</Text>
             </TouchableOpacity>
           ))}
         </View>

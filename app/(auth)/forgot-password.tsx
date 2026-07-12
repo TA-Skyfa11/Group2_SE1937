@@ -29,19 +29,19 @@ export default function ForgotPasswordScreen() {
 
   if (sent) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#0a0a0a", justifyContent: "center", alignItems: "center", paddingHorizontal: 24 }}>
+      <View style={{ flex: 1, backgroundColor: "#f7f8fb", justifyContent: "center", alignItems: "center", paddingHorizontal: 24 }}>
         <Text style={{ fontSize: 48, marginBottom: 24 }}>✉️</Text>
-        <Text style={{ color: "#fff", fontSize: 22, fontWeight: "700", marginBottom: 12, textAlign: "center" }}>
+        <Text style={{ color: "#0f172a", fontSize: 22, fontWeight: "700", marginBottom: 12, textAlign: "center" }}>
           Kiểm tra hộp thư của bạn
         </Text>
-        <Text style={{ color: "#737373", fontSize: 15, textAlign: "center", marginBottom: 32 }}>
+        <Text style={{ color: "#64748b", fontSize: 15, textAlign: "center", marginBottom: 32 }}>
           Chúng tôi đã gửi liên kết đặt lại mật khẩu tới {email}
         </Text>
         <TouchableOpacity
-          style={{ backgroundColor: "#171717", borderWidth: 1, borderColor: "#262626", borderRadius: 12, paddingVertical: 14, paddingHorizontal: 32 }}
+          style={{ backgroundColor: "#ffffff", borderWidth: 1, borderColor: "#e7e9ee", borderRadius: 12, paddingVertical: 14, paddingHorizontal: 32 }}
           onPress={() => router.back()}
         >
-          <Text style={{ color: "#fff", fontWeight: "600" }}>Quay lại đăng nhập</Text>
+          <Text style={{ color: "#0f172a", fontWeight: "600" }}>Quay lại đăng nhập</Text>
         </TouchableOpacity>
       </View>
     );
@@ -49,27 +49,27 @@ export default function ForgotPasswordScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: "#0a0a0a" }}
+      style={{ flex: 1, backgroundColor: "#f7f8fb" }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <View style={{ flex: 1, justifyContent: "center", paddingHorizontal: 24 }}>
         <TouchableOpacity style={{ marginBottom: 32 }} onPress={() => router.back()}>
-          <Text style={{ color: "#737373", fontSize: 15 }}>← Quay lại</Text>
+          <Text style={{ color: "#64748b", fontSize: 15 }}>← Quay lại</Text>
         </TouchableOpacity>
-        <Text style={{ fontSize: 32, fontWeight: "700", color: "#fff", marginBottom: 8 }}>
+        <Text style={{ fontSize: 32, fontWeight: "700", color: "#0f172a", marginBottom: 8 }}>
           Đặt lại mật khẩu
         </Text>
-        <Text style={{ color: "#737373", fontSize: 15, marginBottom: 32 }}>
+        <Text style={{ color: "#64748b", fontSize: 15, marginBottom: 32 }}>
           Nhập email của bạn, chúng tôi sẽ gửi liên kết đặt lại mật khẩu.
         </Text>
         <TextInput
           style={{
-            backgroundColor: "#171717", borderWidth: 1, borderColor: "#262626",
+            backgroundColor: "#ffffff", borderWidth: 1, borderColor: "#e7e9ee",
             borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14,
-            color: "#fff", fontSize: 15, marginBottom: 16,
+            color: "#0f172a", fontSize: 15, marginBottom: 16,
           }}
           placeholder="you@example.com"
-          placeholderTextColor="#525252"
+          placeholderTextColor="#94a3b8"
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"

@@ -29,12 +29,12 @@ export default function TransactionsScreen() {
   });
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#0a0a0a" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#f7f8fb" }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 12, padding: 16 }}>
         <TouchableOpacity onPress={() => router.back()}>
-          <Text style={{ color: "#737373", fontSize: 15 }}>← Quay lại</Text>
+          <Text style={{ color: "#64748b", fontSize: 15 }}>← Quay lại</Text>
         </TouchableOpacity>
-        <Text style={{ color: "#fff", fontSize: 20, fontWeight: "700" }}>Giao dịch</Text>
+        <Text style={{ color: "#0f172a", fontSize: 20, fontWeight: "700" }}>Giao dịch</Text>
       </View>
 
       {isLoading ? (
@@ -47,22 +47,22 @@ export default function TransactionsScreen() {
             <View
               key={tx.id}
               style={{
-                backgroundColor: "#171717", borderWidth: 1, borderColor: "#262626",
+                backgroundColor: "#ffffff", borderWidth: 1, borderColor: "#e7e9ee",
                 borderRadius: 14, padding: 14, marginBottom: 8,
                 flexDirection: "row", alignItems: "center", gap: 12,
               }}
             >
-              <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: "#262626", alignItems: "center", justifyContent: "center" }}>
+              <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: "#e7e9ee", alignItems: "center", justifyContent: "center" }}>
                 <Text style={{ fontSize: 20 }}>{TX_ICON[tx.type] ?? "🪙"}</Text>
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={{ color: "#fff", fontSize: 14, fontWeight: "600" }} numberOfLines={1}>
+                <Text style={{ color: "#0f172a", fontSize: 14, fontWeight: "600" }} numberOfLines={1}>
                   {tx.description}
                 </Text>
-                <Text style={{ color: "#737373", fontSize: 12, marginTop: 2 }}>
+                <Text style={{ color: "#64748b", fontSize: 12, marginTop: 2 }}>
                   Số dư còn lại: 🪙 {tx.balanceAfter.toLocaleString()}
                 </Text>
-                <Text style={{ color: "#525252", fontSize: 11, marginTop: 2 }}>
+                <Text style={{ color: "#94a3b8", fontSize: 11, marginTop: 2 }}>
                   {formatRelative(tx.createdAt)}
                 </Text>
               </View>

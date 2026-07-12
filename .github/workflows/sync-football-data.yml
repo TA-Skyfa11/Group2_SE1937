@@ -1,0 +1,31 @@
+name: Sync Football Data
+
+on:
+  schedule:
+    # Chạy mỗi 10 phút (GitHub Actions không đảm bảo đúng giờ tuyệt đối,
+    # có thể trễ vài phút khi hệ thống bận — chấp nhận được cho use case này)
+    - cron: "*/10 * * * *"
+  workflow_dispatch: # cho phép bấm nút "Run workflow" để chạy tay trên GitHub
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        working-directory: scripts
+        run: npm install
+
+      - name: Run sync
+        working-directory: scripts
+        env:
+          FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: node sync-football-data.js all

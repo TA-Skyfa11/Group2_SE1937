@@ -12,8 +12,20 @@ import { useUIStore } from "../../store/uiStore";
 import { useAuthStore } from "../../store/authStore";
 import { authService } from "../../services/authService";
 import { userService } from "../../services/userService";
+import { RoleGuard } from "../../components/common/RoleGuard";
 
 export default function ProfileScreen() {
+  // Profile is user-only (reads/writes the user's own Firestore doc).
+  // RoleGuard redirects Guests to /login instead of letting this screen
+  // mount and fire authenticated-only Firestore queries.
+  return (
+    <RoleGuard requiredRole="user">
+      <ProfileScreenContent />
+    </RoleGuard>
+  );
+}
+
+function ProfileScreenContent() {
   const { user, isAdmin, logout } = useAuth();
   const { balance, totalEarned, totalLost } = useCoins();
   const { unreadCount } = useNotifications();
@@ -86,14 +98,14 @@ export default function ProfileScreen() {
   ];
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#0a0a0a" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#f7f8fb" }}>
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
         {/* Avatar + name */}
         <View style={{ alignItems: "center", paddingTop: 32, paddingBottom: 24, paddingHorizontal: 16 }}>
           <View
             style={{
               width: 88, height: 88, borderRadius: 44,
-              backgroundColor: "#171717", borderWidth: 2, borderColor: "#14b8a6",
+              backgroundColor: "#ffffff", borderWidth: 2, borderColor: "#14b8a6",
               alignItems: "center", justifyContent: "center", marginBottom: 16,
             }}
           >
@@ -102,10 +114,10 @@ export default function ProfileScreen() {
             </Text>
           </View>
 
-          <Text style={{ color: "#fff", fontSize: 22, fontWeight: "700" }}>
+          <Text style={{ color: "#0f172a", fontSize: 22, fontWeight: "700" }}>
             {user?.displayName ?? "Khách"}
           </Text>
-          <Text style={{ color: "#737373", fontSize: 14, marginTop: 4 }}>
+          <Text style={{ color: "#64748b", fontSize: 14, marginTop: 4 }}>
             @{user?.username ?? "unknown"}
           </Text>
 
@@ -125,8 +137,8 @@ export default function ProfileScreen() {
         {/* Stats grid */}
         <View
           style={{
-            marginHorizontal: 16, backgroundColor: "#171717",
-            borderWidth: 1, borderColor: "#262626", borderRadius: 16,
+            marginHorizontal: 16, backgroundColor: "#ffffff",
+            borderWidth: 1, borderColor: "#e7e9ee", borderRadius: 16,
             overflow: "hidden", marginBottom: 16,
           }}
         >
@@ -136,7 +148,7 @@ export default function ProfileScreen() {
               style={{
                 flexDirection: "row",
                 borderTopWidth: ri > 0 ? 1 : 0,
-                borderTopColor: "#262626",
+                borderTopColor: "#e7e9ee",
               }}
             >
               {row.map(({ label, value }, ci) => (
@@ -145,11 +157,11 @@ export default function ProfileScreen() {
                   style={{
                     flex: 1, padding: 16,
                     borderLeftWidth: ci > 0 ? 1 : 0,
-                    borderLeftColor: "#262626",
+                    borderLeftColor: "#e7e9ee",
                   }}
                 >
-                  <Text style={{ color: "#737373", fontSize: 11, marginBottom: 6 }}>{label}</Text>
-                  <Text style={{ color: "#fff", fontSize: 16, fontWeight: "600" }}>{value}</Text>
+                  <Text style={{ color: "#64748b", fontSize: 11, marginBottom: 6 }}>{label}</Text>
+                  <Text style={{ color: "#0f172a", fontSize: 16, fontWeight: "600" }}>{value}</Text>
                 </View>
               ))}
             </View>
@@ -163,13 +175,13 @@ export default function ProfileScreen() {
               key={label}
               onPress={onPress}
               style={{
-                backgroundColor: "#171717", borderWidth: 1, borderColor: "#262626",
+                backgroundColor: "#ffffff", borderWidth: 1, borderColor: "#e7e9ee",
                 borderRadius: 14, padding: 16,
                 flexDirection: "row", alignItems: "center",
               }}
             >
               <Text style={{ fontSize: 20, marginRight: 14 }}>{icon}</Text>
-              <Text style={{ color: "#fff", flex: 1, fontSize: 15, fontWeight: "500" }}>{label}</Text>
+              <Text style={{ color: "#0f172a", flex: 1, fontSize: 15, fontWeight: "500" }}>{label}</Text>
               {badge !== undefined && (
                 <View
                   style={{
@@ -183,7 +195,7 @@ export default function ProfileScreen() {
                   </Text>
                 </View>
               )}
-              <Text style={{ color: "#404040", fontSize: 20 }}>›</Text>
+              <Text style={{ color: "#cbd5e1", fontSize: 20 }}>›</Text>
             </TouchableOpacity>
           ))}
         </View>

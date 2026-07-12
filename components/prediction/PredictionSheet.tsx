@@ -84,7 +84,7 @@ export function PredictionSheet({ match }: Props) {
         >
           <View
             style={{
-              backgroundColor: "#171717",
+              backgroundColor: "#ffffff",
               borderTopLeftRadius: 24,
               borderTopRightRadius: 24,
               padding: 20,
@@ -96,7 +96,7 @@ export function PredictionSheet({ match }: Props) {
               style={{
                 width: 40,
                 height: 4,
-                backgroundColor: "#404040",
+                backgroundColor: "#cbd5e1",
                 borderRadius: 2,
                 alignSelf: "center",
                 marginBottom: 20,
@@ -106,43 +106,43 @@ export function PredictionSheet({ match }: Props) {
             {/* Header */}
             <View className="flex-row items-center justify-between mb-5">
               <View>
-                <Text className="text-white text-lg font-bold">Đặt dự đoán</Text>
-                <Text className="text-neutral-400 text-sm mt-0.5">
-                  {match.homeTeam.name} vs {match.awayTeam.name}
+                <Text className="text-slate-900 text-lg font-bold">Đặt dự đoán</Text>
+                <Text className="text-slate-500 text-sm mt-0.5">
+                  {match.homeTeam.name} - {match.awayTeam.name}
                 </Text>
               </View>
               <TouchableOpacity onPress={resetPrediction}>
-                <Text className="text-neutral-400 text-sm">Hủy</Text>
+                <Text className="text-slate-500 text-sm">Hủy</Text>
               </TouchableOpacity>
             </View>
 
             {/* Selected outcome */}
             {outcome && (
               <View className="bg-teal-500/10 border border-teal-500/30 rounded-xl p-4 mb-4">
-                <Text className="text-neutral-400 text-xs mb-1">Dự đoán của bạn</Text>
-                <Text className="text-teal-400 font-bold text-lg">
+                <Text className="text-slate-500 text-xs mb-1">Dự đoán của bạn</Text>
+                <Text className="text-teal-600 font-bold text-lg">
                   {OUTCOME_LABELS[outcome]}
                 </Text>
-                <Text className="text-white font-semibold mt-1">
+                <Text className="text-slate-900 font-semibold mt-1">
                   Tỷ lệ: {formatOdds(currentOdds)}
                 </Text>
               </View>
             )}
 
             {/* Amount input */}
-            <Text className="text-neutral-400 text-sm mb-2">
+            <Text className="text-slate-500 text-sm mb-2">
               Số coin muốn cược{" "}
-              <Text className="text-white">(số dư: {coinBalance.toLocaleString()})</Text>
+              <Text className="text-slate-900">(số dư: {coinBalance.toLocaleString()})</Text>
             </Text>
-            <View className="bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 flex-row items-center mb-3">
-              <Text className="text-yellow-400 mr-2 text-base">🪙</Text>
+            <View className="bg-white border border-slate-200 rounded-xl px-4 py-3 flex-row items-center mb-3">
+              <Text className="text-yellow-600 mr-2 text-base">🪙</Text>
               <TextInput
-                style={{ flex: 1, color: "#fff", fontSize: 18, fontWeight: "600" }}
+                style={{ flex: 1, color: "#0f172a", fontSize: 18, fontWeight: "600" }}
                 value={amount}
                 onChangeText={(v) => setAmount(v.replace(/[^0-9]/g, ""))}
                 keyboardType="number-pad"
                 placeholder="100"
-                placeholderTextColor="#525252"
+                placeholderTextColor="#94a3b8"
               />
             </View>
 
@@ -154,13 +154,13 @@ export function PredictionSheet({ match }: Props) {
                   className={`flex-1 py-2 rounded-lg items-center border ${
                     betAmount === q
                       ? "border-teal-500 bg-teal-500/10"
-                      : "border-neutral-800 bg-neutral-900"
+                      : "border-slate-200 bg-white"
                   }`}
                   onPress={() => setAmount(String(q))}
                 >
                   <Text
                     className={`text-xs font-medium ${
-                      betAmount === q ? "text-teal-400" : "text-neutral-400"
+                      betAmount === q ? "text-teal-600" : "text-slate-500"
                     }`}
                   >
                     {q}
@@ -168,27 +168,27 @@ export function PredictionSheet({ match }: Props) {
                 </TouchableOpacity>
               ))}
               <TouchableOpacity
-                className="flex-1 py-2 rounded-lg items-center border border-neutral-800 bg-neutral-900"
+                className="flex-1 py-2 rounded-lg items-center border border-slate-200 bg-white"
                 onPress={() => setAmount(String(coinBalance))}
               >
-                <Text className="text-xs font-medium text-neutral-400">Tất cả</Text>
+                <Text className="text-xs font-medium text-slate-500">Tất cả</Text>
               </TouchableOpacity>
             </View>
 
             {/* Payout preview */}
-            <View className="bg-neutral-900 border border-neutral-800 rounded-xl p-4 mb-4">
+            <View className="bg-white border border-slate-200 rounded-xl p-4 mb-4">
               <View className="flex-row justify-between mb-2">
-                <Text className="text-neutral-400 text-sm">Số cược</Text>
-                <Text className="text-white text-sm">{betAmount.toLocaleString()} 🪙</Text>
+                <Text className="text-slate-500 text-sm">Số cược</Text>
+                <Text className="text-slate-900 text-sm">{betAmount.toLocaleString()} 🪙</Text>
               </View>
               <View className="flex-row justify-between mb-2">
-                <Text className="text-neutral-400 text-sm">Tỷ lệ</Text>
-                <Text className="text-white text-sm">{formatOdds(currentOdds)}</Text>
+                <Text className="text-slate-500 text-sm">Tỷ lệ</Text>
+                <Text className="text-slate-900 text-sm">{formatOdds(currentOdds)}</Text>
               </View>
-              <View style={{ height: 1, backgroundColor: "#262626", marginBottom: 8 }} />
+              <View style={{ height: 1, backgroundColor: "#e7e9ee", marginBottom: 8 }} />
               <View className="flex-row justify-between">
-                <Text className="text-neutral-400 text-sm font-medium">Tiền có thể nhận</Text>
-                <Text className="text-teal-400 font-bold text-base">
+                <Text className="text-slate-500 text-sm font-medium">Tiền có thể nhận</Text>
+                <Text className="text-teal-600 font-bold text-base">
                   {potentialPayout.toLocaleString()} 🪙
                 </Text>
               </View>
@@ -196,12 +196,12 @@ export function PredictionSheet({ match }: Props) {
 
             {/* Validation messages */}
             {betAmount > 0 && betAmount < APP_CONFIG.MIN_BET && (
-              <Text className="text-red-400 text-xs mb-3 text-center">
+              <Text className="text-red-600 text-xs mb-3 text-center">
                 Cược tối thiểu là {APP_CONFIG.MIN_BET} coin
               </Text>
             )}
             {betAmount > coinBalance && (
-              <Text className="text-red-400 text-xs mb-3 text-center">
+              <Text className="text-red-600 text-xs mb-3 text-center">
                 Không đủ coin
               </Text>
             )}
@@ -209,7 +209,7 @@ export function PredictionSheet({ match }: Props) {
             {/* Confirm */}
             <TouchableOpacity
               style={{
-                backgroundColor: isInvalid ? "#262626" : "#14b8a6",
+                backgroundColor: isInvalid ? "#e7e9ee" : "#14b8a6",
                 borderRadius: 12,
                 paddingVertical: 16,
                 alignItems: "center",
@@ -220,7 +220,7 @@ export function PredictionSheet({ match }: Props) {
               {isPending ? (
                 <ActivityIndicator color="white" />
               ) : (
-                <Text style={{ color: "#fff", fontWeight: "700", fontSize: 16 }}>
+                <Text style={{ color: isInvalid ? "#94a3b8" : "#fff", fontWeight: "700", fontSize: 16 }}>
                   Xác nhận dự đoán
                 </Text>
               )}

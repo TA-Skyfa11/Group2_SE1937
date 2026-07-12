@@ -5,11 +5,25 @@ import { QUERY_KEYS } from "../constants/queryKeys";
 import { APP_CONFIG } from "../constants/config";
 
 export function useLiveMatches() {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    // Real-time push instead of polling: Firestore only sends data over
+    // the wire when a LIVE match doc actually changes (e.g. the sync
+    // Cloud Function writes a new score/minute), instead of re-running a
+    // full query every 30s regardless of whether anything changed. This
+    // is both more resource-efficient (fewer reads billed, less battery/
+    // network on the phone) AND more "real-time" (no up-to-30s lag).
+    const unsub = matchService.subscribeToLiveMatches((matches) => {
+      queryClient.setQueryData(QUERY_KEYS.matches.live, matches);
+    });
+    return unsub;
+  }, [queryClient]);
+
   return useQuery({
     queryKey: QUERY_KEYS.matches.live,
     queryFn: () => matchService.getLiveMatches(),
-    refetchInterval: APP_CONFIG.LIVE_REFETCH_INTERVAL,
-    staleTime: 0,
+    staleTime: Infinity, // the onSnapshot listener above is the source of truth once mounted
   });
 }
 

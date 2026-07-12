@@ -12,7 +12,7 @@ export default function AuthLayout() {
   }, [isAuthenticated, isLoading]);
 
   return (
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: "#0a0a0a" } }}>
+    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: "#f7f8fb" } }}>
       <Stack.Screen name="login" />
       <Stack.Screen name="register" />
       <Stack.Screen name="forgot-password" />

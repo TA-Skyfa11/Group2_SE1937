@@ -19,13 +19,13 @@ export default function NotificationsScreen() {
     useNotifications();
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#0a0a0a" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#f7f8fb" }}>
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 16 }}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
           <TouchableOpacity onPress={() => router.back()}>
-            <Text style={{ color: "#737373", fontSize: 15 }}>← Quay lại</Text>
+            <Text style={{ color: "#64748b", fontSize: 15 }}>← Quay lại</Text>
           </TouchableOpacity>
-          <Text style={{ color: "#fff", fontSize: 20, fontWeight: "700" }}>Thông báo</Text>
+          <Text style={{ color: "#0f172a", fontSize: 20, fontWeight: "700" }}>Thông báo</Text>
           {unreadCount > 0 && (
             <View style={{ backgroundColor: "#ef4444", borderRadius: 10, minWidth: 20, height: 20, alignItems: "center", justifyContent: "center", paddingHorizontal: 4 }}>
               <Text style={{ color: "#fff", fontSize: 11, fontWeight: "700" }}>
@@ -52,22 +52,22 @@ export default function NotificationsScreen() {
               key={notif.id}
               onPress={() => markRead(notif.id)}
               style={{
-                backgroundColor: notif.isRead ? "#171717" : "rgba(20,184,166,0.07)",
+                backgroundColor: notif.isRead ? "#ffffff" : "rgba(20,184,166,0.07)",
                 borderWidth: 1,
-                borderColor: notif.isRead ? "#262626" : "rgba(20,184,166,0.25)",
+                borderColor: notif.isRead ? "#e7e9ee" : "rgba(20,184,166,0.25)",
                 borderRadius: 14, padding: 14, marginBottom: 8,
                 flexDirection: "row", alignItems: "flex-start", gap: 12,
               }}
             >
               <Text style={{ fontSize: 22 }}>{TYPE_ICON[notif.type] ?? "📢"}</Text>
               <View style={{ flex: 1 }}>
-                <Text style={{ color: "#fff", fontSize: 14, fontWeight: notif.isRead ? "500" : "700" }}>
+                <Text style={{ color: "#0f172a", fontSize: 14, fontWeight: notif.isRead ? "500" : "700" }}>
                   {notif.title}
                 </Text>
-                <Text style={{ color: "#737373", fontSize: 13, marginTop: 3, lineHeight: 18 }}>
+                <Text style={{ color: "#64748b", fontSize: 13, marginTop: 3, lineHeight: 18 }}>
                   {notif.body}
                 </Text>
-                <Text style={{ color: "#525252", fontSize: 11, marginTop: 6 }}>
+                <Text style={{ color: "#94a3b8", fontSize: 11, marginTop: 6 }}>
                   {formatRelative(notif.createdAt)}
                 </Text>
               </View>

@@ -10,7 +10,12 @@ import type { PredictionOutcome } from "../types/match.types";
 
 export function useMyPredictions(statusFilter?: Prediction["status"]) {
   const { firebaseUser, user } = useAuthStore();
-  const uid = firebaseUser?.uid ?? user?.uid ?? "mock-user-1";
+  // Only fall back to the mock uid in mock mode. In real Firebase mode,
+  // falling back to a fake uid here fires a live `predictions` query with
+  // no signed-in user, which Firestore Security Rules correctly reject
+  // with permission-denied. Guests (and any not-yet-loaded auth state)
+  // must resolve to an empty uid so the query stays disabled instead.
+  const uid = firebaseUser?.uid ?? user?.uid ?? (USE_MOCK ? "mock-user-1" : "");
 
   return useQuery({
     queryKey: [...QUERY_KEYS.predictions.mine(uid), statusFilter],
@@ -25,7 +30,11 @@ export function usePlacePrediction() {
   const { showToast } = useUIStore();
   const { resetPrediction } = usePredictionStore();
   const queryClient = useQueryClient();
-  const uid = firebaseUser?.uid ?? user?.uid ?? "mock-user-1";
+  // Same reasoning as useMyPredictions: don't use the mock uid outside of
+  // mock mode, or a guest could attempt a real Firestore write as
+  // "mock-user-1" and get permission-denied instead of a clean, friendly
+  // "please log in" error.
+  const uid = firebaseUser?.uid ?? user?.uid ?? (USE_MOCK ? "mock-user-1" : "");
 
   return useMutation({
     mutationFn: (payload: PlacePredictionPayload) => {

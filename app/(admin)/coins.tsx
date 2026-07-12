@@ -44,16 +44,16 @@ export default function AdminCoinsScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#0a0a0a" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#f7f8fb" }}>
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 16 }}>
-        <Text style={{ color: "#fff", fontSize: 22, fontWeight: "700" }}>Quản lý coin</Text>
+        <Text style={{ color: "#0f172a", fontSize: 22, fontWeight: "700" }}>Quản lý coin</Text>
         <TouchableOpacity onPress={() => router.back()}>
-          <Text style={{ color: "#737373", fontSize: 15 }}>← Quay lại</Text>
+          <Text style={{ color: "#64748b", fontSize: 15 }}>← Quay lại</Text>
         </TouchableOpacity>
       </View>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16 }}>
-        <Text style={{ color: "#737373", fontSize: 13, marginBottom: 16 }}>
+        <Text style={{ color: "#64748b", fontSize: 13, marginBottom: 16 }}>
           Chọn một người dùng để điều chỉnh số dư coin ảo của họ.
         </Text>
 
@@ -61,8 +61,8 @@ export default function AdminCoinsScreen() {
           <View
             key={entry.uid}
             style={{
-              backgroundColor: "#171717", borderWidth: 1,
-              borderColor: selectedUser === entry.uid ? "#14b8a6" : "#262626",
+              backgroundColor: "#ffffff", borderWidth: 1,
+              borderColor: selectedUser === entry.uid ? "#14b8a6" : "#e7e9ee",
               borderRadius: 14, padding: 16, marginBottom: 10,
             }}
           >
@@ -71,12 +71,12 @@ export default function AdminCoinsScreen() {
             >
               <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                 <View>
-                  <Text style={{ color: "#fff", fontSize: 15, fontWeight: "600" }}>{entry.displayName}</Text>
-                  <Text style={{ color: "#737373", fontSize: 12, marginTop: 2 }}>
+                  <Text style={{ color: "#0f172a", fontSize: 15, fontWeight: "600" }}>{entry.displayName}</Text>
+                  <Text style={{ color: "#64748b", fontSize: 12, marginTop: 2 }}>
                     🪙 {entry.coinBalance.toLocaleString()} coin
                   </Text>
                 </View>
-                <Text style={{ color: selectedUser === entry.uid ? "#14b8a6" : "#404040", fontSize: 20 }}>
+                <Text style={{ color: selectedUser === entry.uid ? "#14b8a6" : "#cbd5e1", fontSize: 20 }}>
                   {selectedUser === entry.uid ? "▲" : "▼"}
                 </Text>
               </View>
@@ -84,31 +84,31 @@ export default function AdminCoinsScreen() {
 
             {selectedUser === entry.uid && (
               <View style={{ marginTop: 16 }}>
-                <Text style={{ color: "#737373", fontSize: 12, marginBottom: 8 }}>
+                <Text style={{ color: "#64748b", fontSize: 12, marginBottom: 8 }}>
                   Số lượng (dương để cộng, âm để trừ)
                 </Text>
                 <TextInput
                   style={{
-                    backgroundColor: "#262626", borderWidth: 1, borderColor: "#404040",
+                    backgroundColor: "#e7e9ee", borderWidth: 1, borderColor: "#cbd5e1",
                     borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12,
-                    color: "#fff", fontSize: 15, marginBottom: 10,
+                    color: "#0f172a", fontSize: 15, marginBottom: 10,
                   }}
                   value={amount}
                   onChangeText={setAmount}
                   keyboardType="numbers-and-punctuation"
                   placeholder="+500 hoặc -200"
-                  placeholderTextColor="#525252"
+                  placeholderTextColor="#94a3b8"
                 />
                 <TextInput
                   style={{
-                    backgroundColor: "#262626", borderWidth: 1, borderColor: "#404040",
+                    backgroundColor: "#e7e9ee", borderWidth: 1, borderColor: "#cbd5e1",
                     borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12,
-                    color: "#fff", fontSize: 14, marginBottom: 12,
+                    color: "#0f172a", fontSize: 14, marginBottom: 12,
                   }}
                   value={reason}
                   onChangeText={setReason}
                   placeholder="Lý do (không bắt buộc)"
-                  placeholderTextColor="#525252"
+                  placeholderTextColor="#94a3b8"
                 />
                 <TouchableOpacity
                   onPress={() => handleAdjust(entry.uid, entry.displayName)}

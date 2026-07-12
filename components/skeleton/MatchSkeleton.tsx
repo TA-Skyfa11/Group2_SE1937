@@ -16,14 +16,14 @@ function Pulse({ style }: { style: object }) {
 
   return (
     <Animated.View
-      style={[{ backgroundColor: "#262626", borderRadius: 8, opacity }, style]}
+      style={[{ backgroundColor: "#e7e9ee", borderRadius: 8, opacity }, style]}
     />
   );
 }
 
 export function MatchSkeleton() {
   return (
-    <SafeAreaView className="flex-1 bg-neutral-950">
+    <SafeAreaView className="flex-1 bg-slate-50">
       <View className="px-4 pt-4">
         <Pulse style={{ width: 60, height: 16, marginBottom: 24 }} />
         <View className="flex-row justify-between items-center mb-8">
@@ -58,7 +58,7 @@ export function CardSkeleton() {
   return (
     <Animated.View
       style={{
-        backgroundColor: "#171717",
+        backgroundColor: "#e7e9ee",
         borderRadius: 16,
         padding: 16,
         marginBottom: 12,

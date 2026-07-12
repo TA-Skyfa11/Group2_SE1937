@@ -40,15 +40,15 @@ export default function SearchScreen() {
     (data?.matches.length ?? 0) > 0 || (data?.leagues.length ?? 0) > 0;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#0a0a0a" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#f7f8fb" }}>
       <View style={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 8 }}>
-        <Text style={{ color: "#fff", fontSize: 24, fontWeight: "700", marginBottom: 12 }}>Tìm kiếm</Text>
-        <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#171717", borderWidth: 1, borderColor: "#262626", borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12 }}>
+        <Text style={{ color: "#0f172a", fontSize: 24, fontWeight: "700", marginBottom: 12 }}>Tìm kiếm</Text>
+        <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#ffffff", borderWidth: 1, borderColor: "#e7e9ee", borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12 }}>
           <Text style={{ fontSize: 16, marginRight: 10 }}>🔍</Text>
           <TextInput
-            style={{ flex: 1, color: "#fff", fontSize: 15 }}
+            style={{ flex: 1, color: "#0f172a", fontSize: 15 }}
             placeholder="Đội bóng, giải đấu, trận đấu..."
-            placeholderTextColor="#525252"
+            placeholderTextColor="#94a3b8"
             value={query}
             onChangeText={setQuery}
             autoCapitalize="none"
@@ -56,7 +56,7 @@ export default function SearchScreen() {
           />
           {query.length > 0 && (
             <TouchableOpacity onPress={() => setQuery("")}>
-              <Text style={{ color: "#737373", fontSize: 18 }}>×</Text>
+              <Text style={{ color: "#64748b", fontSize: 18 }}>×</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -66,8 +66,8 @@ export default function SearchScreen() {
         {query.length < 2 ? (
           <View style={{ alignItems: "center", paddingTop: 60 }}>
             <Text style={{ fontSize: 48, marginBottom: 16 }}>🔍</Text>
-            <Text style={{ color: "#fff", fontSize: 17, fontWeight: "600" }}>Tìm kiếm bóng đá</Text>
-            <Text style={{ color: "#737373", fontSize: 14, marginTop: 8, textAlign: "center" }}>
+            <Text style={{ color: "#0f172a", fontSize: 17, fontWeight: "600" }}>Tìm kiếm bóng đá</Text>
+            <Text style={{ color: "#64748b", fontSize: 14, marginTop: 8, textAlign: "center" }}>
               Tìm đội bóng, giải đấu hoặc trận đấu
             </Text>
           </View>
@@ -76,8 +76,8 @@ export default function SearchScreen() {
         ) : !hasResults ? (
           <View style={{ alignItems: "center", paddingTop: 60 }}>
             <Text style={{ fontSize: 48, marginBottom: 16 }}>🤷</Text>
-            <Text style={{ color: "#fff", fontSize: 17, fontWeight: "600" }}>Không có kết quả</Text>
-            <Text style={{ color: "#737373", fontSize: 14, marginTop: 8 }}>
+            <Text style={{ color: "#0f172a", fontSize: 17, fontWeight: "600" }}>Không có kết quả</Text>
+            <Text style={{ color: "#64748b", fontSize: 14, marginTop: 8 }}>
               Hãy thử từ khóa khác
             </Text>
           </View>
@@ -86,7 +86,7 @@ export default function SearchScreen() {
             {/* Matches */}
             {(data?.matches.length ?? 0) > 0 && (
               <View style={{ marginBottom: 20 }}>
-                <Text style={{ color: "#737373", fontSize: 12, fontWeight: "600", textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>
+                <Text style={{ color: "#64748b", fontSize: 12, fontWeight: "600", textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>
                   Trận đấu
                 </Text>
                 {data!.matches.map((match) => (
@@ -94,13 +94,13 @@ export default function SearchScreen() {
                     key={match.id}
                     onPress={() => router.push(`/match/${match.id}` as any)}
                     style={{
-                      backgroundColor: "#171717", borderWidth: 1, borderColor: "#262626",
+                      backgroundColor: "#ffffff", borderWidth: 1, borderColor: "#e7e9ee",
                       borderRadius: 12, padding: 14, marginBottom: 8,
                     }}
                   >
-                    <Text style={{ color: "#737373", fontSize: 11, marginBottom: 4 }}>{match.leagueName}</Text>
-                    <Text style={{ color: "#fff", fontSize: 14, fontWeight: "600" }}>
-                      {match.homeTeam.name} vs {match.awayTeam.name}
+                    <Text style={{ color: "#64748b", fontSize: 11, marginBottom: 4 }}>{match.leagueName}</Text>
+                    <Text style={{ color: "#0f172a", fontSize: 14, fontWeight: "600" }}>
+                      {match.homeTeam.name} - {match.awayTeam.name}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -110,7 +110,7 @@ export default function SearchScreen() {
             {/* Leagues */}
             {(data?.leagues.length ?? 0) > 0 && (
               <View style={{ marginBottom: 20 }}>
-                <Text style={{ color: "#737373", fontSize: 12, fontWeight: "600", textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>
+                <Text style={{ color: "#64748b", fontSize: 12, fontWeight: "600", textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>
                   Giải đấu
                 </Text>
                 {data!.leagues.map((league) => (
@@ -118,15 +118,15 @@ export default function SearchScreen() {
                     key={league.id}
                     onPress={() => router.push(`/league/${league.id}` as any)}
                     style={{
-                      backgroundColor: "#171717", borderWidth: 1, borderColor: "#262626",
+                      backgroundColor: "#ffffff", borderWidth: 1, borderColor: "#e7e9ee",
                       borderRadius: 12, padding: 14, marginBottom: 8,
                       flexDirection: "row", alignItems: "center", gap: 12,
                     }}
                   >
                     <Text style={{ fontSize: 24 }}>🏆</Text>
                     <View>
-                      <Text style={{ color: "#fff", fontSize: 14, fontWeight: "600" }}>{league.name}</Text>
-                      <Text style={{ color: "#737373", fontSize: 12, marginTop: 2 }}>{league.country}</Text>
+                      <Text style={{ color: "#0f172a", fontSize: 14, fontWeight: "600" }}>{league.name}</Text>
+                      <Text style={{ color: "#64748b", fontSize: 12, marginTop: 2 }}>{league.country}</Text>
                     </View>
                   </TouchableOpacity>
                 ))}

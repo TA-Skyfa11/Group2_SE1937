@@ -54,33 +54,33 @@ export default function RegisterScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: "#0a0a0a" }}
+      style={{ flex: 1, backgroundColor: "#f7f8fb" }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
         <View style={{ flex: 1, justifyContent: "center", paddingHorizontal: 24, paddingVertical: 48 }}>
           <View style={{ marginBottom: 32 }}>
-            <Text style={{ fontSize: 32, fontWeight: "700", color: "#fff", marginBottom: 8 }}>
+            <Text style={{ fontSize: 32, fontWeight: "700", color: "#0f172a", marginBottom: 8 }}>
               Tạo tài khoản
             </Text>
-            <Text style={{ color: "#737373", fontSize: 15 }}>
+            <Text style={{ color: "#64748b", fontSize: 15 }}>
               Bắt đầu với 1.000 coin miễn phí 🪙
             </Text>
           </View>
 
           {fields.map(({ label, field, placeholder, keyboard, secure }) => (
             <View key={field} style={{ marginBottom: 16 }}>
-              <Text style={{ color: "#737373", fontSize: 13, marginBottom: 8, fontWeight: "500" }}>
+              <Text style={{ color: "#64748b", fontSize: 13, marginBottom: 8, fontWeight: "500" }}>
                 {label}
               </Text>
               <TextInput
                 style={{
-                  backgroundColor: "#171717", borderWidth: 1, borderColor: "#262626",
+                  backgroundColor: "#ffffff", borderWidth: 1, borderColor: "#e7e9ee",
                   borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14,
-                  color: "#fff", fontSize: 15,
+                  color: "#0f172a", fontSize: 15,
                 }}
                 placeholder={placeholder}
-                placeholderTextColor="#525252"
+                placeholderTextColor="#94a3b8"
                 value={form[field]}
                 onChangeText={update(field)}
                 keyboardType={(keyboard as any) ?? "default"}
@@ -106,7 +106,7 @@ export default function RegisterScreen() {
           </TouchableOpacity>
 
           <View style={{ flexDirection: "row", justifyContent: "center", marginTop: 24 }}>
-            <Text style={{ color: "#737373" }}>Đã có tài khoản? </Text>
+            <Text style={{ color: "#64748b" }}>Đã có tài khoản? </Text>
             <Link href="/(auth)/login" asChild>
               <TouchableOpacity>
                 <Text style={{ color: "#14b8a6", fontWeight: "500" }}>Đăng nhập</Text>

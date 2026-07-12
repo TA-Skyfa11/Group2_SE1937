@@ -47,10 +47,10 @@ export const predictionService = {
     const { matchId, outcome, amount } = payload;
 
     if (amount < APP_CONFIG.MIN_BET) {
-      throw new Error(`Minimum bet is ${APP_CONFIG.MIN_BET} coins.`);
+      throw new Error(`Số coin cược tối thiểu là ${APP_CONFIG.MIN_BET}.`);
     }
     if (amount > APP_CONFIG.MAX_BET) {
-      throw new Error(`Maximum bet is ${APP_CONFIG.MAX_BET} coins.`);
+      throw new Error(`Số coin cược tối đa là ${APP_CONFIG.MAX_BET}.`);
     }
 
     if (USE_MOCK) {
@@ -93,16 +93,24 @@ export const predictionService = {
     return runTransaction(db, async (txn) => {
       const userRef = getDocRef<UserProfile>(Collections.USERS, uid);
       const userSnap = await txn.get(userRef);
-      if (!userSnap.exists()) throw new Error("User not found.");
+      if (!userSnap.exists()) throw new Error("Không tìm thấy người dùng.");
       const userData = userSnap.data() as UserProfile;
-      if (userData.coinBalance < amount) throw new Error("Insufficient coins.");
+      if (userData.coinBalance < amount) throw new Error("Số dư coin không đủ.");
 
       const matchRef = getDocRef<Match>(Collections.MATCHES, matchId);
       const matchSnap = await txn.get(matchRef);
-      if (!matchSnap.exists()) throw new Error("Match not found.");
+      if (!matchSnap.exists()) throw new Error("Không tìm thấy trận đấu.");
       const matchData = matchSnap.data() as Match;
-      if (!matchData.isPredictionOpen) throw new Error("Predictions are closed.");
-      if (matchData.isSettled) throw new Error("Match already settled.");
+      if (!matchData.isPredictionOpen) throw new Error("Trận đấu đã đóng dự đoán.");
+      if (matchData.isSettled) throw new Error("Trận đấu đã được xử lý kết quả.");
+      // Defense-in-depth: don't rely solely on `isPredictionOpen`, which is
+      // only as fresh as the last sync job run (e.g. every 10 minutes, or
+      // stale entirely if the sync job hasn't run). Also check the actual
+      // kickoff time directly, so a match can never be bet on once it has
+      // genuinely started — even if `isPredictionOpen` hasn't caught up yet.
+      if (matchData.utcDate.toMillis() <= Date.now()) {
+        throw new Error("Trận đấu đã bắt đầu, không thể đặt dự đoán.");
+      }
 
       const updatedStats = {
         ...matchData.predictionStats,
@@ -155,7 +163,7 @@ export const predictionService = {
         amount: -amount,
         balanceAfter: userData.coinBalance - amount,
         reference: predictionId,
-        description: `Đã dự đoán ${OUTCOME_LABEL_VI[outcome]} — ${matchData.homeTeam.name} vs ${matchData.awayTeam.name}`,
+        description: `Đã dự đoán ${OUTCOME_LABEL_VI[outcome]} — ${matchData.homeTeam.name} - ${matchData.awayTeam.name}`,
         createdAt: now,
       });
 

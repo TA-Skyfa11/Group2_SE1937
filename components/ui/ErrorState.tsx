@@ -12,10 +12,10 @@ export function ErrorState({
   return (
     <View className="flex-1 items-center justify-center py-16 px-6">
       <Text className="text-4xl mb-4">⚠️</Text>
-      <Text className="text-white font-semibold text-lg text-center mb-2">
+      <Text className="text-slate-900 font-semibold text-lg text-center mb-2">
         Rất tiếc!
       </Text>
-      <Text className="text-neutral-400 text-sm text-center mb-6">{message}</Text>
+      <Text className="text-slate-500 text-sm text-center mb-6">{message}</Text>
       {onRetry && (
         <TouchableOpacity
           className="bg-teal-500 px-6 py-3 rounded-xl"

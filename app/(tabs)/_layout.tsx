@@ -1,7 +1,5 @@
-import { useEffect } from "react";
-import { Tabs, router } from "expo-router";
+import { Tabs } from "expo-router";
 import { View, Text } from "react-native";
-import { useAuthStore } from "../../store/authStore";
 import { useNotifications } from "../../hooks/useNotifications";
 
 function TabIcon({ emoji, focused }: { emoji: string; focused: boolean }) {
@@ -36,28 +34,27 @@ function NotifIcon({ focused }: { focused: boolean }) {
 }
 
 export default function TabLayout() {
-  const { isAuthenticated, isLoading } = useAuthStore();
-
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.replace("/(auth)/login" as any);
-    }
-  }, [isAuthenticated, isLoading]);
-
+  // NOTE: This layout intentionally does NOT redirect guests to /login.
+  // Trang chủ (Home), Giải đấu (Leagues) and Tìm kiếm (Search) must stay
+  // accessible to Guests (xem lịch thi đấu / kết quả / thông tin trận đấu
+  // là public). Only "Dự đoán" (Prediction) and "Cá nhân" (Profile) are
+  // restricted to logged-in users — each of those two screens guards
+  // itself with <RoleGuard requiredRole="user"> instead, so the other
+  // three tabs are never gated.
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: "#0a0a0a",
-          borderTopColor: "#171717",
+          backgroundColor: "#f7f8fb",
+          borderTopColor: "#ffffff",
           borderTopWidth: 1,
           height: 80,
           paddingBottom: 20,
           paddingTop: 8,
         },
         tabBarActiveTintColor: "#14b8a6",
-        tabBarInactiveTintColor: "#525252",
+        tabBarInactiveTintColor: "#94a3b8",
         tabBarLabelStyle: { fontSize: 10, fontWeight: "600", marginTop: 2 },
       }}
     >

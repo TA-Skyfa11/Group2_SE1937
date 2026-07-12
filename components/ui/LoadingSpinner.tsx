@@ -8,7 +8,7 @@ interface Props {
 export function LoadingSpinner({ size = "large", fullScreen = false }: Props) {
   if (fullScreen) {
     return (
-      <View className="flex-1 bg-neutral-950 items-center justify-center">
+      <View className="flex-1 bg-slate-50 items-center justify-center">
         <ActivityIndicator color="#14b8a6" size={size} />
       </View>
     );

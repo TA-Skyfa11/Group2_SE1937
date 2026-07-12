@@ -33,7 +33,7 @@ export default function LoginScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: "#0a0a0a" }}
+      style={{ flex: 1, backgroundColor: "#f7f8fb" }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
@@ -43,29 +43,29 @@ export default function LoginScreen() {
         <View style={{ flex: 1, justifyContent: "center", paddingHorizontal: 24, paddingVertical: 48 }}>
           {/* Header */}
           <View style={{ marginBottom: 40 }}>
-            <Text style={{ fontSize: 36, fontWeight: "700", color: "#fff", marginBottom: 8 }}>
+            <Text style={{ fontSize: 36, fontWeight: "700", color: "#0f172a", marginBottom: 8 }}>
               ⚽ Match
             </Text>
             <Text style={{ fontSize: 36, fontWeight: "700", color: "#14b8a6", marginBottom: 8 }}>
               Pulse
             </Text>
-            <Text style={{ color: "#737373", fontSize: 15 }}>
+            <Text style={{ color: "#64748b", fontSize: 15 }}>
               Đăng nhập để xem tỷ số và dự đoán
             </Text>
           </View>
 
           {/* Email */}
-          <Text style={{ color: "#737373", fontSize: 13, marginBottom: 8, fontWeight: "500" }}>
+          <Text style={{ color: "#64748b", fontSize: 13, marginBottom: 8, fontWeight: "500" }}>
             Email
           </Text>
           <TextInput
             style={{
-              backgroundColor: "#171717", borderWidth: 1, borderColor: "#262626",
+              backgroundColor: "#ffffff", borderWidth: 1, borderColor: "#e7e9ee",
               borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14,
-              color: "#fff", fontSize: 15, marginBottom: 16,
+              color: "#0f172a", fontSize: 15, marginBottom: 16,
             }}
             placeholder="you@example.com"
-            placeholderTextColor="#525252"
+            placeholderTextColor="#94a3b8"
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
@@ -74,18 +74,18 @@ export default function LoginScreen() {
           />
 
           {/* Password */}
-          <Text style={{ color: "#737373", fontSize: 13, marginBottom: 8, fontWeight: "500" }}>
+          <Text style={{ color: "#64748b", fontSize: 13, marginBottom: 8, fontWeight: "500" }}>
             Password
           </Text>
           <View style={{ position: "relative", marginBottom: 12 }}>
             <TextInput
               style={{
-                backgroundColor: "#171717", borderWidth: 1, borderColor: "#262626",
+                backgroundColor: "#ffffff", borderWidth: 1, borderColor: "#e7e9ee",
                 borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14,
-                color: "#fff", fontSize: 15, paddingRight: 60,
+                color: "#0f172a", fontSize: 15, paddingRight: 60,
               }}
               placeholder="••••••••"
-              placeholderTextColor="#525252"
+              placeholderTextColor="#94a3b8"
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!showPass}
@@ -95,7 +95,7 @@ export default function LoginScreen() {
               style={{ position: "absolute", right: 16, top: 14 }}
               onPress={() => setShowPass(!showPass)}
             >
-              <Text style={{ color: "#737373", fontSize: 13 }}>
+              <Text style={{ color: "#64748b", fontSize: 13 }}>
                 {showPass ? "Ẩn" : "Hiện"}
               </Text>
             </TouchableOpacity>
@@ -123,7 +123,7 @@ export default function LoginScreen() {
           </TouchableOpacity>
 
           <View style={{ flexDirection: "row", justifyContent: "center", marginTop: 32 }}>
-            <Text style={{ color: "#737373" }}>Chưa có tài khoản? </Text>
+            <Text style={{ color: "#64748b" }}>Chưa có tài khoản? </Text>
             <Link href="/(auth)/register" asChild>
               <TouchableOpacity>
                 <Text style={{ color: "#14b8a6", fontWeight: "500" }}>Đăng ký</Text>

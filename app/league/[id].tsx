@@ -37,19 +37,19 @@ export default function LeagueDetailScreen() {
   });
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#0a0a0a" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#f7f8fb" }}>
       {/* Back + header */}
       <View style={{ paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8 }}>
         <TouchableOpacity onPress={() => router.back()} style={{ marginBottom: 14 }}>
-          <Text style={{ color: "#737373", fontSize: 15 }}>← Quay lại</Text>
+          <Text style={{ color: "#64748b", fontSize: 15 }}>← Quay lại</Text>
         </TouchableOpacity>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
           <Text style={{ fontSize: 32 }}>🏆</Text>
           <View>
-            <Text style={{ color: "#fff", fontSize: 20, fontWeight: "700" }}>
+            <Text style={{ color: "#0f172a", fontSize: 20, fontWeight: "700" }}>
               {leagueLoad ? "Đang tải..." : league?.name ?? "Giải đấu"}
             </Text>
-            <Text style={{ color: "#737373", fontSize: 13 }}>
+            <Text style={{ color: "#64748b", fontSize: 13 }}>
               {league?.country ?? ""}
             </Text>
           </View>
@@ -67,11 +67,11 @@ export default function LeagueDetailScreen() {
             onPress={() => setTab(t)}
             style={{
               flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: "center",
-              backgroundColor: tab === t ? "#14b8a6" : "#171717",
-              borderWidth: 1, borderColor: tab === t ? "#14b8a6" : "#262626",
+              backgroundColor: tab === t ? "#14b8a6" : "#ffffff",
+              borderWidth: 1, borderColor: tab === t ? "#14b8a6" : "#e7e9ee",
             }}
           >
-            <Text style={{ color: tab === t ? "#fff" : "#737373", fontSize: 14, fontWeight: "600" }}>
+            <Text style={{ color: tab === t ? "#fff" : "#64748b", fontSize: 14, fontWeight: "600" }}>
               {label}
             </Text>
           </TouchableOpacity>
@@ -99,11 +99,11 @@ export default function LeagueDetailScreen() {
           ) : (
             <View style={{ paddingBottom: 48 }}>
               {/* Header row */}
-              <View style={{ flexDirection: "row", paddingHorizontal: 16, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: "#262626" }}>
-                <Text style={{ color: "#737373", fontSize: 11, width: 30 }}>#</Text>
-                <Text style={{ color: "#737373", fontSize: 11, flex: 1 }}>Đội</Text>
+              <View style={{ flexDirection: "row", paddingHorizontal: 16, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: "#e7e9ee" }}>
+                <Text style={{ color: "#64748b", fontSize: 11, width: 30 }}>#</Text>
+                <Text style={{ color: "#64748b", fontSize: 11, flex: 1 }}>Đội</Text>
                 {["P", "W", "D", "L", "GD", "Pts"].map((h) => (
-                  <Text key={h} style={{ color: "#737373", fontSize: 11, width: 30, textAlign: "center" }}>{h}</Text>
+                  <Text key={h} style={{ color: "#64748b", fontSize: 11, width: 30, textAlign: "center" }}>{h}</Text>
                 ))}
               </View>
               {standing.table.map((row: StandingRow, i: number) => (
@@ -112,25 +112,25 @@ export default function LeagueDetailScreen() {
                   style={{
                     flexDirection: "row", paddingHorizontal: 16, paddingVertical: 12,
                     alignItems: "center",
-                    borderBottomWidth: 0.5, borderBottomColor: "#1a1a1a",
-                    backgroundColor: i % 2 === 0 ? "transparent" : "rgba(255,255,255,0.01)",
+                    borderBottomWidth: 0.5, borderBottomColor: "#e5e7eb",
+                    backgroundColor: i % 2 === 0 ? "transparent" : "rgba(15,23,42,0.03)",
                   }}
                 >
                   <Text style={{
                     fontSize: 12, fontWeight: "700", width: 30,
-                    color: row.position <= 4 ? "#14b8a6" : row.position >= standing.table.length - 2 ? "#ef4444" : "#737373",
+                    color: row.position <= 4 ? "#14b8a6" : row.position >= standing.table.length - 2 ? "#ef4444" : "#64748b",
                   }}>
                     {row.position}
                   </Text>
-                  <Text style={{ color: "#fff", fontSize: 13, fontWeight: "500", flex: 1 }} numberOfLines={1}>
+                  <Text style={{ color: "#0f172a", fontSize: 13, fontWeight: "500", flex: 1 }} numberOfLines={1}>
                     {row.teamName}
                   </Text>
                   {[row.playedGames, row.won, row.draw, row.lost, row.goalDifference].map((val, vi) => (
-                    <Text key={vi} style={{ color: "#a3a3a3", fontSize: 12, width: 30, textAlign: "center" }}>
+                    <Text key={vi} style={{ color: "#94a3b8", fontSize: 12, width: 30, textAlign: "center" }}>
                       {val > 0 && vi === 4 ? `+${val}` : val}
                     </Text>
                   ))}
-                  <Text style={{ color: "#fff", fontSize: 13, fontWeight: "700", width: 30, textAlign: "center" }}>
+                  <Text style={{ color: "#0f172a", fontSize: 13, fontWeight: "700", width: 30, textAlign: "center" }}>
                     {row.points}
                   </Text>
                 </View>
@@ -139,11 +139,11 @@ export default function LeagueDetailScreen() {
               <View style={{ padding: 16, gap: 6 }}>
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
                   <View style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: "#14b8a6" }} />
-                  <Text style={{ color: "#737373", fontSize: 11 }}>Vòng loại Cúp C1</Text>
+                  <Text style={{ color: "#64748b", fontSize: 11 }}>Vòng loại Cúp C1</Text>
                 </View>
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
                   <View style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: "#ef4444" }} />
-                  <Text style={{ color: "#737373", fontSize: 11 }}>Khu vực xuống hạng</Text>
+                  <Text style={{ color: "#64748b", fontSize: 11 }}>Khu vực xuống hạng</Text>
                 </View>
               </View>
             </View>

@@ -13,14 +13,14 @@ function StandingsTable({ standing }: { standing: Standing }) {
   return (
     <View style={{ marginTop: 8 }}>
       {/* Header */}
-      <View style={{ flexDirection: "row", paddingHorizontal: 12, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: "#262626" }}>
-        <Text style={{ color: "#737373", fontSize: 11, width: 28 }}>#</Text>
-        <Text style={{ color: "#737373", fontSize: 11, flex: 1 }}>Đội</Text>
-        <Text style={{ color: "#737373", fontSize: 11, width: 28, textAlign: "center" }}>P</Text>
-        <Text style={{ color: "#737373", fontSize: 11, width: 28, textAlign: "center" }}>W</Text>
-        <Text style={{ color: "#737373", fontSize: 11, width: 28, textAlign: "center" }}>D</Text>
-        <Text style={{ color: "#737373", fontSize: 11, width: 28, textAlign: "center" }}>L</Text>
-        <Text style={{ color: "#737373", fontSize: 11, width: 36, textAlign: "center" }}>Pts</Text>
+      <View style={{ flexDirection: "row", paddingHorizontal: 12, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: "#e7e9ee" }}>
+        <Text style={{ color: "#64748b", fontSize: 11, width: 28 }}>#</Text>
+        <Text style={{ color: "#64748b", fontSize: 11, flex: 1 }}>Đội</Text>
+        <Text style={{ color: "#64748b", fontSize: 11, width: 28, textAlign: "center" }}>ST</Text>
+        <Text style={{ color: "#64748b", fontSize: 11, width: 28, textAlign: "center" }}>T</Text>
+        <Text style={{ color: "#64748b", fontSize: 11, width: 28, textAlign: "center" }}>H</Text>
+        <Text style={{ color: "#64748b", fontSize: 11, width: 28, textAlign: "center" }}>B</Text>
+        <Text style={{ color: "#64748b", fontSize: 11, width: 36, textAlign: "center" }}>Đ</Text>
       </View>
       {standing.table.map((row, i) => (
         <View
@@ -28,24 +28,24 @@ function StandingsTable({ standing }: { standing: Standing }) {
           style={{
             flexDirection: "row", paddingHorizontal: 12, paddingVertical: 10,
             alignItems: "center",
-            borderBottomWidth: 0.5, borderBottomColor: "#1a1a1a",
-            backgroundColor: i % 2 === 0 ? "transparent" : "rgba(255,255,255,0.01)",
+            borderBottomWidth: 0.5, borderBottomColor: "#e5e7eb",
+            backgroundColor: i % 2 === 0 ? "transparent" : "rgba(15,23,42,0.03)",
           }}
         >
           <Text style={{
-            color: row.position <= 4 ? "#14b8a6" : row.position >= standing.table.length - 2 ? "#ef4444" : "#737373",
+            color: row.position <= 4 ? "#14b8a6" : row.position >= standing.table.length - 2 ? "#ef4444" : "#64748b",
             fontSize: 12, fontWeight: "600", width: 28,
           }}>
             {row.position}
           </Text>
-          <Text style={{ color: "#fff", fontSize: 13, fontWeight: "500", flex: 1 }} numberOfLines={1}>
+          <Text style={{ color: "#0f172a", fontSize: 13, fontWeight: "500", flex: 1 }} numberOfLines={1}>
             {row.teamName}
           </Text>
-          <Text style={{ color: "#a3a3a3", fontSize: 12, width: 28, textAlign: "center" }}>{row.playedGames}</Text>
-          <Text style={{ color: "#a3a3a3", fontSize: 12, width: 28, textAlign: "center" }}>{row.won}</Text>
-          <Text style={{ color: "#a3a3a3", fontSize: 12, width: 28, textAlign: "center" }}>{row.draw}</Text>
-          <Text style={{ color: "#a3a3a3", fontSize: 12, width: 28, textAlign: "center" }}>{row.lost}</Text>
-          <Text style={{ color: "#fff", fontSize: 13, fontWeight: "700", width: 36, textAlign: "center" }}>{row.points}</Text>
+          <Text style={{ color: "#94a3b8", fontSize: 12, width: 28, textAlign: "center" }}>{row.playedGames}</Text>
+          <Text style={{ color: "#94a3b8", fontSize: 12, width: 28, textAlign: "center" }}>{row.won}</Text>
+          <Text style={{ color: "#94a3b8", fontSize: 12, width: 28, textAlign: "center" }}>{row.draw}</Text>
+          <Text style={{ color: "#94a3b8", fontSize: 12, width: 28, textAlign: "center" }}>{row.lost}</Text>
+          <Text style={{ color: "#0f172a", fontSize: 13, fontWeight: "700", width: 36, textAlign: "center" }}>{row.points}</Text>
         </View>
       ))}
     </View>
@@ -62,34 +62,34 @@ function LeagueSection({ league }: { league: League }) {
   });
 
   return (
-    <View style={{ backgroundColor: "#171717", borderWidth: 1, borderColor: "#262626", borderRadius: 16, marginBottom: 12, overflow: "hidden" }}>
+    <View style={{ backgroundColor: "#ffffff", borderWidth: 1, borderColor: "#e7e9ee", borderRadius: 16, marginBottom: 12, overflow: "hidden" }}>
       <TouchableOpacity
         onPress={() => setExpanded(!expanded)}
         style={{ flexDirection: "row", alignItems: "center", padding: 16 }}
       >
-        <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: "#262626", alignItems: "center", justifyContent: "center", marginRight: 12 }}>
+        <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: "#e7e9ee", alignItems: "center", justifyContent: "center", marginRight: 12 }}>
           <Text style={{ fontSize: 20 }}>🏆</Text>
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={{ color: "#fff", fontSize: 15, fontWeight: "600" }}>{league.name}</Text>
-          <Text style={{ color: "#737373", fontSize: 12, marginTop: 2 }}>{league.country}</Text>
+          <Text style={{ color: "#0f172a", fontSize: 15, fontWeight: "600" }}>{league.name}</Text>
+          <Text style={{ color: "#64748b", fontSize: 12, marginTop: 2 }}>{league.country}</Text>
         </View>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
           <TouchableOpacity onPress={() => router.push(`/league/${league.id}` as any)}>
             <Text style={{ color: "#14b8a6", fontSize: 12 }}>Trận đấu</Text>
           </TouchableOpacity>
-          <Text style={{ color: "#525252", fontSize: 18 }}>{expanded ? "▲" : "▼"}</Text>
+          <Text style={{ color: "#94a3b8", fontSize: 18 }}>{expanded ? "▲" : "▼"}</Text>
         </View>
       </TouchableOpacity>
 
       {expanded && (
-        <View style={{ borderTopWidth: 1, borderTopColor: "#262626" }}>
+        <View style={{ borderTopWidth: 1, borderTopColor: "#e7e9ee" }}>
           {isLoading ? (
             <ActivityIndicator color="#14b8a6" style={{ paddingVertical: 20 }} />
           ) : standing ? (
             <StandingsTable standing={standing} />
           ) : (
-            <Text style={{ color: "#737373", textAlign: "center", padding: 16, fontSize: 13 }}>
+            <Text style={{ color: "#64748b", textAlign: "center", padding: 16, fontSize: 13 }}>
               Chưa có bảng xếp hạng
             </Text>
           )}
@@ -107,10 +107,10 @@ export default function LeaguesScreen() {
   });
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#0a0a0a" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#f7f8fb" }}>
       <View style={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 12 }}>
-        <Text style={{ color: "#fff", fontSize: 24, fontWeight: "700" }}>Giải đấu</Text>
-        <Text style={{ color: "#737373", fontSize: 13, marginTop: 4 }}>
+        <Text style={{ color: "#0f172a", fontSize: 24, fontWeight: "700" }}>Giải đấu</Text>
+        <Text style={{ color: "#64748b", fontSize: 13, marginTop: 4 }}>
           Bảng xếp hạng & lịch đấu
         </Text>
       </View>

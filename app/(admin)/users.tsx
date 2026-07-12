@@ -68,32 +68,32 @@ export default function AdminUsersScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#0a0a0a" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#f7f8fb" }}>
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 16, paddingBottom: 8 }}>
-        <Text style={{ color: "#fff", fontSize: 22, fontWeight: "700" }}>Quản lý người dùng</Text>
+        <Text style={{ color: "#0f172a", fontSize: 22, fontWeight: "700" }}>Quản lý người dùng</Text>
         <TouchableOpacity onPress={() => router.back()}>
-          <Text style={{ color: "#737373", fontSize: 15 }}>← Quay lại</Text>
+          <Text style={{ color: "#64748b", fontSize: 15 }}>← Quay lại</Text>
         </TouchableOpacity>
       </View>
 
       {/* Search bar */}
       <View style={{ paddingHorizontal: 16, marginBottom: 10 }}>
         <View style={{
-          flexDirection: "row", alignItems: "center", backgroundColor: "#171717",
-          borderWidth: 1, borderColor: "#262626", borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10,
+          flexDirection: "row", alignItems: "center", backgroundColor: "#ffffff",
+          borderWidth: 1, borderColor: "#e7e9ee", borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10,
         }}>
           <Text style={{ fontSize: 15, marginRight: 8 }}>🔍</Text>
           <TextInput
-            style={{ flex: 1, color: "#fff", fontSize: 14 }}
+            style={{ flex: 1, color: "#0f172a", fontSize: 14 }}
             placeholder="Tìm theo tên hoặc email..."
-            placeholderTextColor="#525252"
+            placeholderTextColor="#94a3b8"
             value={query}
             onChangeText={setQuery}
             autoCapitalize="none"
           />
           {query.length > 0 && (
             <TouchableOpacity onPress={() => setQuery("")}>
-              <Text style={{ color: "#737373", fontSize: 18 }}>×</Text>
+              <Text style={{ color: "#64748b", fontSize: 18 }}>×</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -101,7 +101,7 @@ export default function AdminUsersScreen() {
 
       {/* Filter chips */}
       <View style={{ paddingHorizontal: 16, marginBottom: 4 }}>
-        <Text style={{ color: "#525252", fontSize: 11, marginBottom: 6 }}>Vai trò</Text>
+        <Text style={{ color: "#94a3b8", fontSize: 11, marginBottom: 6 }}>Vai trò</Text>
         <View style={{ flexDirection: "row", gap: 8, marginBottom: 10 }}>
           {([
             { key: "all", label: "Tất cả" },
@@ -113,18 +113,18 @@ export default function AdminUsersScreen() {
               onPress={() => setRoleFilter(f.key)}
               style={{
                 paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20,
-                backgroundColor: roleFilter === f.key ? "#14b8a6" : "#171717",
-                borderWidth: 1, borderColor: roleFilter === f.key ? "#14b8a6" : "#262626",
+                backgroundColor: roleFilter === f.key ? "#14b8a6" : "#ffffff",
+                borderWidth: 1, borderColor: roleFilter === f.key ? "#14b8a6" : "#e7e9ee",
               }}
             >
-              <Text style={{ color: roleFilter === f.key ? "#fff" : "#737373", fontSize: 12, fontWeight: "600" }}>
+              <Text style={{ color: roleFilter === f.key ? "#fff" : "#64748b", fontSize: 12, fontWeight: "600" }}>
                 {f.label}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        <Text style={{ color: "#525252", fontSize: 11, marginBottom: 6 }}>Trạng thái</Text>
+        <Text style={{ color: "#94a3b8", fontSize: 11, marginBottom: 6 }}>Trạng thái</Text>
         <View style={{ flexDirection: "row", gap: 8, marginBottom: 12 }}>
           {([
             { key: "all", label: "Tất cả" },
@@ -136,11 +136,11 @@ export default function AdminUsersScreen() {
               onPress={() => setStatusFilter(f.key)}
               style={{
                 paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20,
-                backgroundColor: statusFilter === f.key ? "#14b8a6" : "#171717",
-                borderWidth: 1, borderColor: statusFilter === f.key ? "#14b8a6" : "#262626",
+                backgroundColor: statusFilter === f.key ? "#14b8a6" : "#ffffff",
+                borderWidth: 1, borderColor: statusFilter === f.key ? "#14b8a6" : "#e7e9ee",
               }}
             >
-              <Text style={{ color: statusFilter === f.key ? "#fff" : "#737373", fontSize: 12, fontWeight: "600" }}>
+              <Text style={{ color: statusFilter === f.key ? "#fff" : "#64748b", fontSize: 12, fontWeight: "600" }}>
                 {f.label}
               </Text>
             </TouchableOpacity>
@@ -148,7 +148,7 @@ export default function AdminUsersScreen() {
         </View>
       </View>
 
-      <Text style={{ color: "#525252", fontSize: 12, paddingHorizontal: 16, marginBottom: 8 }}>
+      <Text style={{ color: "#94a3b8", fontSize: 12, paddingHorizontal: 16, marginBottom: 8 }}>
         {filtered.length} / {users.length} người dùng
       </Text>
 
@@ -159,15 +159,15 @@ export default function AdminUsersScreen() {
         renderItem={({ item }) => (
           <View
             style={{
-              backgroundColor: "#171717", borderWidth: 1,
-              borderColor: item.isActive ? "#262626" : "rgba(239,68,68,0.3)",
+              backgroundColor: "#ffffff", borderWidth: 1,
+              borderColor: item.isActive ? "#e7e9ee" : "rgba(239,68,68,0.3)",
               borderRadius: 14, padding: 16, marginBottom: 10,
             }}
           >
             <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 6 }}>
               <View style={{ flex: 1, marginRight: 8 }}>
-                <Text style={{ color: "#fff", fontSize: 15, fontWeight: "600" }}>{item.displayName}</Text>
-                <Text style={{ color: "#737373", fontSize: 12, marginTop: 2 }}>{item.email}</Text>
+                <Text style={{ color: "#0f172a", fontSize: 15, fontWeight: "600" }}>{item.displayName}</Text>
+                <Text style={{ color: "#64748b", fontSize: 12, marginTop: 2 }}>{item.email}</Text>
               </View>
               <View style={{
                 backgroundColor: item.role === "admin" ? "rgba(239,68,68,0.15)" : "rgba(20,184,166,0.15)",
@@ -180,9 +180,9 @@ export default function AdminUsersScreen() {
             </View>
 
             <View style={{ flexDirection: "row", gap: 16, marginBottom: 12 }}>
-              <Text style={{ color: "#737373", fontSize: 12 }}>🪙 {item.coinBalance.toLocaleString()}</Text>
-              <Text style={{ color: "#737373", fontSize: 12 }}>🎯 {item.totalPredictions}</Text>
-              <Text style={{ color: "#737373", fontSize: 12 }}>✓ {Math.round(item.winRate * 100)}%</Text>
+              <Text style={{ color: "#64748b", fontSize: 12 }}>🪙 {item.coinBalance.toLocaleString()}</Text>
+              <Text style={{ color: "#64748b", fontSize: 12 }}>🎯 {item.totalPredictions}</Text>
+              <Text style={{ color: "#64748b", fontSize: 12 }}>✓ {Math.round(item.winRate * 100)}%</Text>
             </View>
 
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
@@ -213,7 +213,7 @@ export default function AdminUsersScreen() {
         ListEmptyComponent={
           <View style={{ alignItems: "center", paddingTop: 48 }}>
             <Text style={{ fontSize: 32, marginBottom: 12 }}>🔍</Text>
-            <Text style={{ color: "#737373", fontSize: 13 }}>Không tìm thấy người dùng phù hợp</Text>
+            <Text style={{ color: "#64748b", fontSize: 13 }}>Không tìm thấy người dùng phù hợp</Text>
           </View>
         }
       />

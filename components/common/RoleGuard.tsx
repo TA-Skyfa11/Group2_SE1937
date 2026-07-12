@@ -37,7 +37,7 @@ export function RoleGuard({
 
   if (isLoading) {
     return (
-      <View className="flex-1 bg-neutral-950 items-center justify-center">
+      <View className="flex-1 bg-slate-50 items-center justify-center">
         <ActivityIndicator color="#14b8a6" size="large" />
       </View>
     );
@@ -45,12 +45,12 @@ export function RoleGuard({
 
   if (!hasAccess) {
     return (
-      <View className="flex-1 bg-neutral-950 items-center justify-center px-6">
+      <View className="flex-1 bg-slate-50 items-center justify-center px-6">
         <Text className="text-4xl mb-4">🔒</Text>
-        <Text className="text-white text-xl font-bold mb-2 text-center">
+        <Text className="text-slate-900 text-xl font-bold mb-2 text-center">
           Không có quyền truy cập
         </Text>
-        <Text className="text-neutral-400 text-center">
+        <Text className="text-slate-500 text-center">
           Bạn không có quyền xem trang này.
         </Text>
       </View>

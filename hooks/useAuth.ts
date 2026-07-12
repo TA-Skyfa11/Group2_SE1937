@@ -44,18 +44,61 @@ export function useAuth() {
       setFirebaseUser(fbUser);
 
       if (fbUser) {
+        // Force-refresh the ID token so any Custom Claims change (e.g. an
+        // admin role granted via scripts/set-admin-role.js while this
+        // device still had a cached session/token) is picked up right
+        // away. Without this, Firestore Security Rules keep seeing the
+        // stale `request.auth.token.role` and every admin write fails
+        // with permission-denied even though the UI already shows the
+        // Admin screen (which is gated by the Firestore `role` field,
+        // not by the token).
+        await firebaseAuth.getIdTokenResult(fbUser, true).catch(() => {});
+
         const docRef = getDocRef<UserProfile>(Collections.USERS, fbUser.uid);
-        unsubProfile = onSnapshot(docRef, (snap) => {
-          if (snap.exists()) {
-            setUserProfile({ ...(snap.data() as UserProfile), uid: snap.id });
+        let gotFirstSnapshot = false;
+        unsubProfile = onSnapshot(
+          docRef,
+          (snap) => {
+            if (snap.exists()) {
+              setUserProfile({ ...(snap.data() as UserProfile), uid: snap.id });
+            } else if (!gotFirstSnapshot) {
+              // Signed-in account with NO Firestore profile doc (e.g. the
+              // Firestore write during registration failed while the
+              // Firebase Auth account still got created — an "orphaned"
+              // account). Without self-healing this, `role` stays stuck
+              // at "guest" forever even though the user is really signed
+              // in, permanently locking them out of "Dự đoán" / "Cá
+              // nhân" (RoleGuard never sees them as role >= "user").
+              // Creating the missing doc here re-triggers this same
+              // onSnapshot listener with the new data automatically.
+              userService.ensureProfile(fbUser).catch(() => {});
+            }
+            // Only the FIRST snapshot should resolve the app-wide loading
+            // state — this guarantees `role` is already correct (not
+            // just `isAuthenticated`) by the time any screen reads
+            // `isLoading === false`, closing the race where a screen
+            // gated on requiredRole="user" would briefly (or, for an
+            // orphaned account, permanently) see role still at its
+            // "guest" default right after login.
+            if (!gotFirstSnapshot) {
+              gotFirstSnapshot = true;
+              setLoading(false);
+            }
+          },
+          () => {
+            // e.g. permission-denied — don't leave the app stuck loading
+            // forever if the profile listener itself errors out.
+            if (!gotFirstSnapshot) {
+              gotFirstSnapshot = true;
+              setLoading(false);
+            }
           }
-        });
+        );
       } else {
         unsubProfile?.();
         setUserProfile(null);
+        setLoading(false);
       }
-
-      setLoading(false);
     });
 
     return () => {

@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, router } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
@@ -28,11 +28,11 @@ export default function TeamDetailScreen() {
   const isFav = isTeamFavorite(id ?? "");
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#0a0a0a" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#f7f8fb" }}>
       {/* Top bar */}
       <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8 }}>
         <TouchableOpacity onPress={() => router.back()}>
-          <Text style={{ color: "#737373", fontSize: 15 }}>← Quay lại</Text>
+          <Text style={{ color: "#64748b", fontSize: 15 }}>← Quay lại</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => id && toggleTeam(id)}>
           <Text style={{ fontSize: 22 }}>{isFav ? "❤️" : "🤍"}</Text>
@@ -48,18 +48,24 @@ export default function TeamDetailScreen() {
           <>
             {/* Team header */}
             <View style={{ alignItems: "center", padding: 24 }}>
-              <View style={{ width: 88, height: 88, borderRadius: 44, backgroundColor: "#171717", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
-                <Text style={{ fontSize: 40 }}>🛡</Text>
+              <View style={{ width: 88, height: 88, borderRadius: 44, backgroundColor: "#ffffff", borderWidth: 1, borderColor: "#e7e9ee", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
+                {team.crest ? (
+                  <Image source={{ uri: team.crest }} style={{ width: 60, height: 60 }} resizeMode="contain" />
+                ) : (
+                  <Text style={{ fontSize: 28, fontWeight: "700", color: "#94a3b8" }}>
+                    {team.tla?.slice(0, 2) || "?"}
+                  </Text>
+                )}
               </View>
-              <Text style={{ color: "#fff", fontSize: 24, fontWeight: "700" }}>{team.name}</Text>
-              <Text style={{ color: "#737373", fontSize: 14, marginTop: 4 }}>{team.country}</Text>
+              <Text style={{ color: "#0f172a", fontSize: 24, fontWeight: "700" }}>{team.name}</Text>
+              <Text style={{ color: "#64748b", fontSize: 14, marginTop: 4 }}>{team.country}</Text>
               {team.venue && (
-                <Text style={{ color: "#525252", fontSize: 13, marginTop: 4 }}>📍 {team.venue.name}, {team.venue.city}</Text>
+                <Text style={{ color: "#94a3b8", fontSize: 13, marginTop: 4 }}>📍 {team.venue.name}, {team.venue.city}</Text>
               )}
             </View>
 
             {/* Info grid */}
-            <View style={{ marginHorizontal: 16, backgroundColor: "#171717", borderWidth: 1, borderColor: "#262626", borderRadius: 16, overflow: "hidden", marginBottom: 20 }}>
+            <View style={{ marginHorizontal: 16, backgroundColor: "#ffffff", borderWidth: 1, borderColor: "#e7e9ee", borderRadius: 16, overflow: "hidden", marginBottom: 20 }}>
               {[
                 [
                   { label: "Tên viết tắt", value: team.shortName },
@@ -78,11 +84,11 @@ export default function TeamDetailScreen() {
               ]
                 .filter(Boolean)
                 .map((row, ri) => (
-                  <View key={ri} style={{ flexDirection: "row", borderTopWidth: ri > 0 ? 1 : 0, borderTopColor: "#262626" }}>
+                  <View key={ri} style={{ flexDirection: "row", borderTopWidth: ri > 0 ? 1 : 0, borderTopColor: "#e7e9ee" }}>
                     {(row as any[]).map(({ label, value }: any, ci: number) => (
-                      <View key={ci} style={{ flex: 1, padding: 14, borderLeftWidth: ci > 0 ? 1 : 0, borderLeftColor: "#262626" }}>
-                        <Text style={{ color: "#737373", fontSize: 11, marginBottom: 4 }}>{label}</Text>
-                        <Text style={{ color: "#fff", fontSize: 14, fontWeight: "600" }}>{value}</Text>
+                      <View key={ci} style={{ flex: 1, padding: 14, borderLeftWidth: ci > 0 ? 1 : 0, borderLeftColor: "#e7e9ee" }}>
+                        <Text style={{ color: "#64748b", fontSize: 11, marginBottom: 4 }}>{label}</Text>
+                        <Text style={{ color: "#0f172a", fontSize: 14, fontWeight: "600" }}>{value}</Text>
                       </View>
                     ))}
                   </View>
@@ -91,7 +97,7 @@ export default function TeamDetailScreen() {
 
             {/* Squad */}
             <View style={{ marginHorizontal: 16, marginBottom: 48 }}>
-              <Text style={{ color: "#fff", fontSize: 17, fontWeight: "700", marginBottom: 12 }}>Danh sách cầu thủ</Text>
+              <Text style={{ color: "#0f172a", fontSize: 17, fontWeight: "700", marginBottom: 12 }}>Danh sách cầu thủ</Text>
               {playersLoad ? (
                 <ActivityIndicator color="#14b8a6" />
               ) : (players?.length ?? 0) === 0 ? (
@@ -101,22 +107,22 @@ export default function TeamDetailScreen() {
                   <View
                     key={p.id}
                     style={{
-                      backgroundColor: "#171717", borderWidth: 1, borderColor: "#262626",
+                      backgroundColor: "#ffffff", borderWidth: 1, borderColor: "#e7e9ee",
                       borderRadius: 12, padding: 14, marginBottom: 8,
                       flexDirection: "row", alignItems: "center",
                     }}
                   >
-                    <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: "#262626", alignItems: "center", justifyContent: "center", marginRight: 12 }}>
-                      <Text style={{ color: "#737373", fontSize: 13, fontWeight: "700" }}>
+                    <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: "#e7e9ee", alignItems: "center", justifyContent: "center", marginRight: 12 }}>
+                      <Text style={{ color: "#64748b", fontSize: 13, fontWeight: "700" }}>
                         {p.shirtNumber ?? "?"}
                       </Text>
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text style={{ color: "#fff", fontSize: 14, fontWeight: "600" }}>{p.name}</Text>
-                      <Text style={{ color: "#737373", fontSize: 12, marginTop: 2 }}>{p.position} · {p.nationality}</Text>
+                      <Text style={{ color: "#0f172a", fontSize: 14, fontWeight: "600" }}>{p.name}</Text>
+                      <Text style={{ color: "#64748b", fontSize: 12, marginTop: 2 }}>{p.position} · {p.nationality}</Text>
                     </View>
                     <View style={{ alignItems: "flex-end" }}>
-                      <Text style={{ color: "#737373", fontSize: 11 }}>⚽ {p.stats.goals} 🎯 {p.stats.assists}</Text>
+                      <Text style={{ color: "#64748b", fontSize: 11 }}>⚽ {p.stats.goals} 🎯 {p.stats.assists}</Text>
                     </View>
                   </View>
                 ))

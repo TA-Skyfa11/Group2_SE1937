@@ -2,86 +2,104 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-
     function isAuth()        { return request.auth != null; }
     function uid()           { return request.auth.uid; }
     function role()          { return request.auth.token.role; }
-    function isUser()        { return isAuth() && role() == 'user'; }
     function isAdmin()       { return isAuth() && role() == 'admin'; }
-    function isUserOrAdmin() { return isUser() || isAdmin(); }
     function isOwner(id)     { return isAuth() && uid() == id; }
-
-    function protectedFields() {
-      return ['coinBalance','role','winRate','totalPredictions',
-              'correctPredictions','currentStreak','bestStreak',
-              'totalEarned','totalLost'];
-    }
 
     match /matches/{matchId} {
       allow read: if true;
-      allow write: if isAdmin();
-      match /events/{eventId}   { allow read: if true; allow write: if isAdmin(); }
-      match /lineups/{lineupId} { allow read: if true; allow write: if isAdmin(); }
+      allow create: if isAdmin();
+      allow update: if isAdmin() || (
+        isAuth() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['predictionStats','odds']) &&
+        resource.data.isPredictionOpen == true &&
+        resource.data.isSettled == false
+      );
+      match /events/{eventId} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
+      match /lineups/{lineupId} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
     }
 
     match /leagues/{leagueId} {
       allow read: if true;
-      allow write: if isAdmin();
-      match /seasons/{sid}    { allow read: if true; allow write: if isAdmin(); }
-      match /standings/{sid}  { allow read: if true; allow write: if isAdmin(); }
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+      match /seasons/{sid} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
+      match /standings/{sid} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
     }
 
     match /teams/{teamId} {
       allow read: if true;
-      allow write: if isAdmin();
-      match /players/{playerId} { allow read: if true; allow write: if isAdmin(); }
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+      match /players/{playerId} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
     }
 
     match /predictions/{predictionId} {
-      allow read: if isAdmin() ||
-        (isAuth() && resource.data.userId == uid());
-      allow create: if isUserOrAdmin()
+      allow read: if isAdmin() || (isAuth() && resource.data.userId == uid());
+      allow create: if isAuth()
         && request.resource.data.userId == uid()
         && request.resource.data.amount > 0
-        && request.resource.data.amount <=
-           get(/databases/$(database)/documents/users/$(uid())).data.coinBalance;
-      allow update: if isAdmin();
+        && request.resource.data.amount <= get(/databases/$(database)/documents/users/$(uid())).data.coinBalance;
+      allow update: if isAdmin() || (
+        isAuth() && resource.data.userId == uid() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'actualPayout', 'settledAt'])
+      );
       allow delete: if false;
     }
 
     match /users/{userId} {
-      allow read:   if isOwner(userId) || isAdmin();
+      allow read: if isOwner(userId) || isAdmin();
       allow create: if isOwner(userId);
-      allow update: if (isOwner(userId)
-        && !request.resource.data.diff(resource.data)
-              .affectedKeys().hasAny(protectedFields()))
-        || isAdmin();
+      allow update: if (isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role'])) || isAdmin();
       allow delete: if isAdmin();
 
       match /transactions/{txId} {
-        allow read:  if isOwner(userId) || isAdmin();
-        allow write: if false;
+        allow read: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId);
+        allow update: if false;
+        allow delete: if false;
       }
+
       match /notifications/{notifId} {
-        allow read:   if isOwner(userId);
-        allow update: if isOwner(userId)
-          && request.resource.data.diff(resource.data)
-                .affectedKeys().hasOnly(['isRead']);
-        allow create: if false;
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId);
+        allow update: if isOwner(userId) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead']);
         allow delete: if isOwner(userId);
       }
+
       match /predictions/{predictionId} {
-        allow read:  if isOwner(userId);
-        allow write: if false;
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId);
+        allow update: if isOwner(userId) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'actualPayout', 'settledAt']);
+        allow delete: if false;
       }
     }
 
     match /leaderboards/{period} {
       allow read: if true;
-      allow write: if false;
+      allow write: if isAdmin();
       match /entries/{entryId} {
-        allow read:  if true;
-        allow write: if false;
+        allow read: if true;
+        allow write: if isAdmin();
       }
     }
   }
