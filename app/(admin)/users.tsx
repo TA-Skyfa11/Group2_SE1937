@@ -2,24 +2,43 @@ import { useState, useMemo } from "react";
 import { View, Text, FlatList, TouchableOpacity, TextInput, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
-import { MOCK_USERS, MockUser } from "../../constants/mockData";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { adminService } from "../../services/adminService";
+import { useAuthStore } from "../../store/authStore";
+import { useUIStore } from "../../store/uiStore";
+import { LoadingSpinner } from "../../components/ui/LoadingSpinner";
+import { ErrorState } from "../../components/ui/ErrorState";
+import { getAdminQueryErrorMessage } from "../../utils/firebaseErrors";
+import type { UserProfile, UserRole } from "../../types/auth.types";
 
 type RoleFilter = "all" | "user" | "admin";
 type StatusFilter = "all" | "active" | "locked";
 
+const QUERY_KEY = ["admin", "users"];
+
 export default function AdminUsersScreen() {
-  // Local copy of the mutable mock array so the screen re-renders on change.
-  const [users, setUsers] = useState<MockUser[]>(MOCK_USERS);
+  const { user: currentAdmin } = useAuthStore();
+  const { showToast } = useUIStore();
+  const queryClient = useQueryClient();
+
+  const { data: users, isLoading, isError, error, refetch } = useQuery({
+    queryKey: QUERY_KEY,
+    queryFn: adminService.getAllUsers,
+    staleTime: 30000,
+  });
+
   const [query, setQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<RoleFilter>("all");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [pendingUid, setPendingUid] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
-    return users.filter((u) => {
+    const list = users ?? [];
+    return list.filter((u) => {
       const matchesQuery =
         query.trim().length === 0 ||
-        u.displayName.toLowerCase().includes(query.toLowerCase()) ||
-        u.email.toLowerCase().includes(query.toLowerCase());
+        u.displayName?.toLowerCase().includes(query.toLowerCase()) ||
+        u.email?.toLowerCase().includes(query.toLowerCase());
       const matchesRole = roleFilter === "all" || u.role === roleFilter;
       const matchesStatus =
         statusFilter === "all" ||
@@ -29,40 +48,65 @@ export default function AdminUsersScreen() {
     });
   }, [users, query, roleFilter, statusFilter]);
 
-  const applyChange = (uid: string, patch: Partial<MockUser>) => {
-    setUsers((prev) => {
-      const next = prev.map((u) => (u.uid === uid ? { ...u, ...patch } : u));
-      // Mutate the shared module-level array too so the change is reflected
-      // if the admin navigates away and back within the same app session.
-      const idx = MOCK_USERS.findIndex((u) => u.uid === uid);
-      if (idx !== -1) MOCK_USERS[idx] = { ...MOCK_USERS[idx], ...patch };
-      return next;
-    });
+  // Optimistic local patch so the list updates instantly, backed by a
+  // real Firestore write.
+  const patchLocal = (uid: string, patch: Partial<UserProfile>) => {
+    queryClient.setQueryData<UserProfile[]>(QUERY_KEY, (prev) =>
+      (prev ?? []).map((u) => (u.uid === uid ? { ...u, ...patch } : u))
+    );
   };
 
-  const handleToggleActive = (user: MockUser) => {
+  const handleToggleActive = (target: UserProfile) => {
     Alert.alert(
-      user.isActive ? "Khóa tài khoản" : "Mở khóa tài khoản",
-      `Bạn có chắc muốn ${user.isActive ? "khóa" : "mở khóa"} tài khoản của ${user.displayName}?`,
+      target.isActive ? "Khóa tài khoản" : "Mở khóa tài khoản",
+      `Bạn có chắc muốn ${target.isActive ? "khóa" : "mở khóa"} tài khoản của ${target.displayName}?`,
       [
         { text: "Hủy", style: "cancel" },
         {
-          text: user.isActive ? "Khóa" : "Mở khóa",
-          style: user.isActive ? "destructive" : "default",
-          onPress: () => applyChange(user.uid, { isActive: !user.isActive }),
+          text: target.isActive ? "Khóa" : "Mở khóa",
+          style: target.isActive ? "destructive" : "default",
+          onPress: async () => {
+            setPendingUid(target.uid);
+            try {
+              await adminService.setUserActive(target.uid, !target.isActive);
+              patchLocal(target.uid, { isActive: !target.isActive });
+              showToast(target.isActive ? "Đã khóa tài khoản" : "Đã mở khóa tài khoản", "success");
+            } catch (e: any) {
+              showToast(e?.message ?? "Không thể cập nhật. Kiểm tra quyền admin.", "error");
+            } finally {
+              setPendingUid(null);
+            }
+          },
         },
       ]
     );
   };
 
-  const handleChangeRole = (user: MockUser) => {
-    const nextRole = user.role === "admin" ? "user" : "admin";
+  const handleChangeRole = (target: UserProfile) => {
+    const nextRole: UserRole = target.role === "admin" ? "user" : "admin";
     Alert.alert(
       "Đổi vai trò",
-      `Chuyển ${user.displayName} sang vai trò "${nextRole === "admin" ? "Quản trị viên" : "Người dùng"}"?`,
+      `Chuyển ${target.displayName} sang vai trò "${nextRole === "admin" ? "Quản trị viên" : "Người dùng"}"?` +
+        (nextRole === "admin"
+          ? "\n\nLưu ý: để tài khoản này thực sự có quyền ghi dữ liệu quản trị (sửa trận đấu, giải đấu...), bạn còn cần chạy scripts/set-admin-role.js với email của họ — bước này chỉ đổi giao diện hiển thị."
+          : ""),
       [
         { text: "Hủy", style: "cancel" },
-        { text: "Xác nhận", onPress: () => applyChange(user.uid, { role: nextRole }) },
+        {
+          text: "Xác nhận",
+          onPress: async () => {
+            setPendingUid(target.uid);
+            try {
+              await adminService.updateUserRole(target.uid, nextRole);
+              patchLocal(target.uid, { role: nextRole });
+              showToast("Đã đổi vai trò", "success");
+            } catch (e: any) {
+              showToast(e?.message ?? "Không thể cập nhật. Kiểm tra quyền admin.", "error");
+            } finally {
+              setPendingUid(null);
+            }
+          },
+        },
       ]
     );
   };
@@ -148,75 +192,98 @@ export default function AdminUsersScreen() {
         </View>
       </View>
 
-      <Text style={{ color: "#94a3b8", fontSize: 12, paddingHorizontal: 16, marginBottom: 8 }}>
-        {filtered.length} / {users.length} người dùng
-      </Text>
+      {isLoading ? (
+        <LoadingSpinner />
+      ) : isError ? (
+        <ErrorState
+          message={getAdminQueryErrorMessage(error)}
+          onRetry={() => refetch()}
+        />
+      ) : (
+        <>
+          <Text style={{ color: "#94a3b8", fontSize: 12, paddingHorizontal: 16, marginBottom: 8 }}>
+            {filtered.length} / {(users ?? []).length} người dùng
+          </Text>
 
-      <FlatList
-        data={filtered}
-        keyExtractor={(item) => item.uid}
-        contentContainerStyle={{ padding: 16, paddingTop: 0 }}
-        renderItem={({ item }) => (
-          <View
-            style={{
-              backgroundColor: "#ffffff", borderWidth: 1,
-              borderColor: item.isActive ? "#e7e9ee" : "rgba(239,68,68,0.3)",
-              borderRadius: 14, padding: 16, marginBottom: 10,
-            }}
-          >
-            <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 6 }}>
-              <View style={{ flex: 1, marginRight: 8 }}>
-                <Text style={{ color: "#0f172a", fontSize: 15, fontWeight: "600" }}>{item.displayName}</Text>
-                <Text style={{ color: "#64748b", fontSize: 12, marginTop: 2 }}>{item.email}</Text>
-              </View>
-              <View style={{
-                backgroundColor: item.role === "admin" ? "rgba(239,68,68,0.15)" : "rgba(20,184,166,0.15)",
-                borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3, alignSelf: "flex-start",
-              }}>
-                <Text style={{ color: item.role === "admin" ? "#f87171" : "#14b8a6", fontSize: 11, fontWeight: "600" }}>
-                  {item.role === "admin" ? "Quản trị" : "Người dùng"}
-                </Text>
-              </View>
-            </View>
-
-            <View style={{ flexDirection: "row", gap: 16, marginBottom: 12 }}>
-              <Text style={{ color: "#64748b", fontSize: 12 }}>🪙 {item.coinBalance.toLocaleString()}</Text>
-              <Text style={{ color: "#64748b", fontSize: 12 }}>🎯 {item.totalPredictions}</Text>
-              <Text style={{ color: "#64748b", fontSize: 12 }}>✓ {Math.round(item.winRate * 100)}%</Text>
-            </View>
-
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-              <View style={{
-                backgroundColor: item.isActive ? "rgba(20,184,166,0.15)" : "rgba(239,68,68,0.15)",
-                borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3,
-              }}>
-                <Text style={{ color: item.isActive ? "#14b8a6" : "#f87171", fontSize: 11, fontWeight: "600" }}>
-                  {item.isActive ? "Đang hoạt động" : "Đã khóa"}
-                </Text>
-              </View>
-              <View style={{ flexDirection: "row", gap: 14 }}>
-                <TouchableOpacity onPress={() => handleChangeRole(item)}>
-                  <Text style={{ color: "#14b8a6", fontSize: 12, fontWeight: "600" }}>Đổi vai trò</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleToggleActive(item)}>
-                  <Text style={{
-                    color: item.isActive ? "#ef4444" : "#22c55e",
-                    fontSize: 12, fontWeight: "600",
+          <FlatList
+            data={filtered}
+            keyExtractor={(item) => item.uid}
+            contentContainerStyle={{ padding: 16, paddingTop: 0 }}
+            renderItem={({ item }) => (
+              <View
+                style={{
+                  backgroundColor: "#ffffff", borderWidth: 1,
+                  borderColor: item.isActive ? "#e7e9ee" : "rgba(239,68,68,0.3)",
+                  borderRadius: 14, padding: 16, marginBottom: 10,
+                  opacity: pendingUid === item.uid ? 0.5 : 1,
+                }}
+              >
+                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 6 }}>
+                  <View style={{ flex: 1, marginRight: 8 }}>
+                    <Text style={{ color: "#0f172a", fontSize: 15, fontWeight: "600" }}>{item.displayName}</Text>
+                    <Text style={{ color: "#64748b", fontSize: 12, marginTop: 2 }}>{item.email}</Text>
+                  </View>
+                  <View style={{
+                    backgroundColor: item.role === "admin" ? "rgba(239,68,68,0.15)" : "rgba(20,184,166,0.15)",
+                    borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3, alignSelf: "flex-start",
                   }}>
-                    {item.isActive ? "Khóa" : "Mở khóa"}
-                  </Text>
-                </TouchableOpacity>
+                    <Text style={{ color: item.role === "admin" ? "#f87171" : "#14b8a6", fontSize: 11, fontWeight: "600" }}>
+                      {item.role === "admin" ? "Quản trị" : "Người dùng"}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={{ flexDirection: "row", gap: 16, marginBottom: 12 }}>
+                  <Text style={{ color: "#64748b", fontSize: 12 }}>🪙 {(item.coinBalance ?? 0).toLocaleString()}</Text>
+                  <Text style={{ color: "#64748b", fontSize: 12 }}>🎯 {item.totalPredictions ?? 0}</Text>
+                  <Text style={{ color: "#64748b", fontSize: 12 }}>✓ {Math.round((item.winRate ?? 0) * 100)}%</Text>
+                </View>
+
+                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                  <View style={{
+                    backgroundColor: item.isActive ? "rgba(20,184,166,0.15)" : "rgba(239,68,68,0.15)",
+                    borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3,
+                  }}>
+                    <Text style={{ color: item.isActive ? "#14b8a6" : "#f87171", fontSize: 11, fontWeight: "600" }}>
+                      {item.isActive ? "Đang hoạt động" : "Đã khóa"}
+                    </Text>
+                  </View>
+                  <View style={{ flexDirection: "row", gap: 14 }}>
+                    <TouchableOpacity
+                      disabled={item.uid === currentAdmin?.uid || pendingUid === item.uid}
+                      onPress={() => handleChangeRole(item)}
+                    >
+                      <Text style={{
+                        color: item.uid === currentAdmin?.uid ? "#cbd5e1" : "#14b8a6",
+                        fontSize: 12, fontWeight: "600",
+                      }}>
+                        Đổi vai trò
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      disabled={item.uid === currentAdmin?.uid || pendingUid === item.uid}
+                      onPress={() => handleToggleActive(item)}
+                    >
+                      <Text style={{
+                        color: item.uid === currentAdmin?.uid ? "#cbd5e1" : item.isActive ? "#ef4444" : "#22c55e",
+                        fontSize: 12, fontWeight: "600",
+                      }}>
+                        {item.isActive ? "Khóa" : "Mở khóa"}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
               </View>
-            </View>
-          </View>
-        )}
-        ListEmptyComponent={
-          <View style={{ alignItems: "center", paddingTop: 48 }}>
-            <Text style={{ fontSize: 32, marginBottom: 12 }}>🔍</Text>
-            <Text style={{ color: "#64748b", fontSize: 13 }}>Không tìm thấy người dùng phù hợp</Text>
-          </View>
-        }
-      />
+            )}
+            ListEmptyComponent={
+              <View style={{ alignItems: "center", paddingTop: 48 }}>
+                <Text style={{ fontSize: 32, marginBottom: 12 }}>🔍</Text>
+                <Text style={{ color: "#64748b", fontSize: 13 }}>Không tìm thấy người dùng phù hợp</Text>
+              </View>
+            }
+          />
+        </>
+      )}
     </SafeAreaView>
   );
 }

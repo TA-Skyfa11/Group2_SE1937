@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity, Image } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
@@ -8,6 +8,7 @@ import { matchService } from "../services/matchService";
 import { teamService } from "../services/teamService";
 import { QUERY_KEYS } from "../constants/queryKeys";
 import { MatchCard } from "../components/match/MatchCard";
+import { TeamCrest } from "../components/common/TeamCrest";
 import { EmptyState } from "../components/ui/EmptyState";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 
@@ -76,13 +77,13 @@ export default function FavoritesScreen() {
                     flexDirection: "row", alignItems: "center",
                   }}
                 >
-                  <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: "#ffffff", borderWidth: 1, borderColor: "#e7e9ee", alignItems: "center", justifyContent: "center", marginRight: 12 }}>
-                    {team?.crest ? (
-                      <Image source={{ uri: team.crest }} style={{ width: 26, height: 26 }} resizeMode="contain" />
+                  <View style={{ width: 40, height: 40, marginRight: 12 }}>
+                    {team ? (
+                      <TeamCrest team={team} size={40} bordered />
                     ) : (
-                      <Text style={{ fontSize: 12, fontWeight: "700", color: "#94a3b8" }}>
-                        {team?.tla?.slice(0, 2) ?? "?"}
-                      </Text>
+                      <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: "#ffffff", borderWidth: 1, borderColor: "#e7e9ee", alignItems: "center", justifyContent: "center" }}>
+                        <Text style={{ fontSize: 12, fontWeight: "700", color: "#94a3b8" }}>?</Text>
+                      </View>
                     )}
                   </View>
                   <Text style={{ color: "#0f172a", flex: 1, fontSize: 14, fontWeight: "600" }} numberOfLines={1}>

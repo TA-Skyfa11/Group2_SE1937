@@ -96,11 +96,24 @@ function mapStatus(fdStatus) {
 }
 
 function mapTeamSnapshot(team) {
+  // Với các trận vòng loại/knockout mà đối thủ chưa được xác định (phụ
+  // thuộc kết quả vòng trước), football-data.org trả về team gần như
+  // rỗng hoàn toàn (id/name/crest đều null). Không xử lý riêng sẽ ra
+  // "team-null" và tên/ảnh trống -> hiện dấu "?" khó hiểu trên app.
+  if (!team || !team.id) {
+    return {
+      id: "team-tbd",
+      name: "Chưa xác định",
+      shortName: "Chưa xác định",
+      tla: "TBD",
+      crest: "",
+    };
+  }
   return {
     id: `team-${team.id}`,
-    name: team.name,
-    shortName: team.shortName ?? team.name,
-    tla: team.tla ?? (team.shortName ?? "").slice(0, 3).toUpperCase() ?? "???",
+    name: team.name || "Chưa xác định",
+    shortName: team.shortName || team.name || "TBD",
+    tla: team.tla || (team.shortName || team.name || "").slice(0, 3).toUpperCase() || "TBD",
     crest: team.crest ?? "",
   };
 }
@@ -243,7 +256,9 @@ async function syncStandings() {
 // ─── Sync: matches + teams ──────────────────────────────────────────────────
 
 async function upsertTeamsFromMatch(fdMatch, leagueOurId) {
-  const teams = [fdMatch.homeTeam, fdMatch.awayTeam];
+  // Bỏ qua các đội chưa xác định (TBD) — không phải đội bóng thật, không
+  // nên xuất hiện trong danh sách "Đội bóng" của app.
+  const teams = [fdMatch.homeTeam, fdMatch.awayTeam].filter((t) => t && t.id);
   const batch = db.batch();
   let hasWrites = false;
 

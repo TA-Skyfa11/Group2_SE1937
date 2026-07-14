@@ -77,6 +77,17 @@ export const authService = {
 
   login: async (credentials: LoginCredentials): Promise<User> => {
     const { user } = await firebaseAuth.login(credentials.email, credentials.password);
+
+    // isActive existed on the profile type but was never actually
+    // enforced anywhere — an admin "locking" an account had no real
+    // effect. Check it here and reject the sign-in if locked.
+    const docRef = getDocRef<UserProfile>(Collections.USERS, user.uid);
+    const profile = await firestoreGet(docRef);
+    if (profile && profile.isActive === false) {
+      await firebaseAuth.logout();
+      throw new Error("Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.");
+    }
+
     return user;
   },
 

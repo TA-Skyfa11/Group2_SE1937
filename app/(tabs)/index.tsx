@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import {
-  View, Text, ScrollView, RefreshControl, TouchableOpacity, ActivityIndicator, Image,
+  View, Text, ScrollView, RefreshControl, TouchableOpacity, ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
@@ -8,19 +8,8 @@ import { useLiveMatches, useFeaturedMatches, useUpcomingMatches } from "../../ho
 import { useAuthStore } from "../../store/authStore";
 import { MatchCard } from "../../components/match/MatchCard";
 import { CoinDisplay } from "../../components/common/CoinDisplay";
+import { TeamCrest } from "../../components/common/TeamCrest";
 import { formatMatchDate } from "../../utils/dateUtils";
-import type { TeamSnapshot } from "../../types/match.types";
-
-function LiveTeamCrest({ team }: { team: TeamSnapshot }) {
-  if (!team.crest) {
-    return (
-      <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: "#e7e9ee", alignItems: "center", justifyContent: "center" }}>
-        <Text style={{ color: "#94a3b8", fontSize: 9, fontWeight: "700" }}>{team.tla?.slice(0, 2) || "?"}</Text>
-      </View>
-    );
-  }
-  return <Image source={{ uri: team.crest }} style={{ width: 20, height: 20, borderRadius: 10 }} resizeMode="contain" />;
-}
 
 export default function HomeScreen() {
   const { user } = useAuthStore();
@@ -96,7 +85,7 @@ export default function HomeScreen() {
                       </View>
                       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                         <View style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 6 }}>
-                          <LiveTeamCrest team={match.homeTeam} />
+                          <TeamCrest team={match.homeTeam} size={20} />
                           <Text style={{ color: "#0f172a", fontWeight: "600", fontSize: 13, flex: 1 }} numberOfLines={1}>
                             {match.homeTeam.shortName}
                           </Text>
@@ -108,7 +97,7 @@ export default function HomeScreen() {
                           <Text style={{ color: "#0f172a", fontWeight: "600", fontSize: 13, flex: 1, textAlign: "right" }} numberOfLines={1}>
                             {match.awayTeam.shortName}
                           </Text>
-                          <LiveTeamCrest team={match.awayTeam} />
+                          <TeamCrest team={match.awayTeam} size={20} />
                         </View>
                       </View>
                     </TouchableOpacity>

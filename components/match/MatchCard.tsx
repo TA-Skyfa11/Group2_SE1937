@@ -1,35 +1,12 @@
-import { TouchableOpacity, View, Text, Image } from "react-native";
+import { TouchableOpacity, View, Text } from "react-native";
 import { router } from "expo-router";
-import type { Match, TeamSnapshot } from "../../types/match.types";
+import type { Match } from "../../types/match.types";
 import { formatMatchDate } from "../../utils/dateUtils";
+import { TeamCrest } from "../common/TeamCrest";
 
 interface Props {
   match: Match;
   showOdds?: boolean;
-}
-
-function TeamCrest({ team }: { team: TeamSnapshot }) {
-  if (!team.crest) {
-    return (
-      <View
-        style={{
-          width: 24, height: 24, borderRadius: 12,
-          backgroundColor: "#e7e9ee", alignItems: "center", justifyContent: "center",
-        }}
-      >
-        <Text style={{ color: "#94a3b8", fontSize: 10, fontWeight: "700" }}>
-          {team.tla?.slice(0, 2) || "?"}
-        </Text>
-      </View>
-    );
-  }
-  return (
-    <Image
-      source={{ uri: team.crest }}
-      style={{ width: 24, height: 24, borderRadius: 12 }}
-      resizeMode="contain"
-    />
-  );
 }
 
 export function MatchCard({ match, showOdds = false }: Props) {

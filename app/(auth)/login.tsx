@@ -1,33 +1,45 @@
-import { useState } from "react";
 import {
-  View, Text, TextInput, TouchableOpacity,
+  View, Text, TouchableOpacity,
   KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator,
 } from "react-native";
 import { Link, router } from "expo-router";
+import { Formik, type FormikHelpers } from "formik";
 import { useAuth } from "../../hooks/useAuth";
-import { useUIStore } from "../../store/uiStore";
+import { FormField } from "../../components/ui/FormField";
+import { loginSchema } from "../../utils/validationSchemas";
+import { getFriendlyAuthErrorMessage, isInvalidCredentialError } from "../../utils/firebaseErrors";
+
+interface LoginValues {
+  email: string;
+  password: string;
+}
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPass, setShowPass] = useState(false);
-  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
-  const { showToast } = useUIStore();
 
-  const handleLogin = async () => {
-    if (!email.trim() || !password) {
-      showToast("Vui lòng điền đầy đủ thông tin", "error");
-      return;
-    }
-    setLoading(true);
+  const handleLogin = async (
+    values: LoginValues,
+    { setErrors, setFieldTouched }: FormikHelpers<LoginValues>
+  ) => {
     try {
-      await login({ email: email.trim().toLowerCase(), password });
+      await login({ email: values.email.trim().toLowerCase(), password: values.password });
       router.replace("/(tabs)" as any);
     } catch (e: any) {
-      showToast(e?.message ?? "Đăng nhập thất bại", "error");
-    } finally {
-      setLoading(false);
+      const message = getFriendlyAuthErrorMessage(e);
+      if (isInvalidCredentialError(e)) {
+        // Không nói rõ là sai email hay sai mật khẩu — gắn lỗi lên cả 2
+        // field, giống cách các app lớn (Google, Facebook...) vẫn làm để
+        // không lộ thông tin email nào đã tồn tại trong hệ thống.
+        setErrors({ email: message, password: message });
+        setFieldTouched("email", true, false);
+        setFieldTouched("password", true, false);
+      } else {
+        // Lỗi khác (email sai định dạng, quá nhiều lần thử, mất mạng...)
+        // gắn vào field email vì đó là nguyên nhân hợp lý nhất để người
+        // dùng nhìn vào sửa trước.
+        setErrors({ email: message });
+        setFieldTouched("email", true, false);
+      }
     }
   };
 
@@ -54,73 +66,61 @@ export default function LoginScreen() {
             </Text>
           </View>
 
-          {/* Email */}
-          <Text style={{ color: "#64748b", fontSize: 13, marginBottom: 8, fontWeight: "500" }}>
-            Email
-          </Text>
-          <TextInput
-            style={{
-              backgroundColor: "#ffffff", borderWidth: 1, borderColor: "#e7e9ee",
-              borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14,
-              color: "#0f172a", fontSize: 15, marginBottom: 16,
-            }}
-            placeholder="you@example.com"
-            placeholderTextColor="#94a3b8"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoComplete="email"
-          />
-
-          {/* Password */}
-          <Text style={{ color: "#64748b", fontSize: 13, marginBottom: 8, fontWeight: "500" }}>
-            Password
-          </Text>
-          <View style={{ position: "relative", marginBottom: 12 }}>
-            <TextInput
-              style={{
-                backgroundColor: "#ffffff", borderWidth: 1, borderColor: "#e7e9ee",
-                borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14,
-                color: "#0f172a", fontSize: 15, paddingRight: 60,
-              }}
-              placeholder="••••••••"
-              placeholderTextColor="#94a3b8"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!showPass}
-              autoComplete="password"
-            />
-            <TouchableOpacity
-              style={{ position: "absolute", right: 16, top: 14 }}
-              onPress={() => setShowPass(!showPass)}
-            >
-              <Text style={{ color: "#64748b", fontSize: 13 }}>
-                {showPass ? "Ẩn" : "Hiện"}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <Link href="/(auth)/forgot-password" asChild>
-            <TouchableOpacity style={{ alignSelf: "flex-end", marginBottom: 24 }}>
-              <Text style={{ color: "#14b8a6", fontSize: 13 }}>Quên mật khẩu?</Text>
-            </TouchableOpacity>
-          </Link>
-
-          <TouchableOpacity
-            style={{
-              backgroundColor: loading ? "#0d9488" : "#14b8a6",
-              borderRadius: 12, paddingVertical: 16, alignItems: "center",
-            }}
-            onPress={handleLogin}
-            disabled={loading}
+          <Formik<LoginValues>
+            initialValues={{ email: "", password: "" }}
+            validationSchema={loginSchema}
+            onSubmit={handleLogin}
           >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={{ color: "#fff", fontWeight: "700", fontSize: 16 }}>Đăng nhập</Text>
+            {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting }) => (
+              <>
+                <FormField
+                  label="Email"
+                  placeholder="you@example.com"
+                  value={values.email}
+                  onChangeText={handleChange("email")}
+                  onBlur={handleBlur("email")}
+                  error={errors.email}
+                  touched={touched.email}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                />
+
+                <FormField
+                  label="Mật khẩu"
+                  placeholder="••••••••"
+                  value={values.password}
+                  onChangeText={handleChange("password")}
+                  onBlur={handleBlur("password")}
+                  error={errors.password}
+                  touched={touched.password}
+                  secureToggle
+                  autoComplete="password"
+                />
+
+                <Link href="/(auth)/forgot-password" asChild>
+                  <TouchableOpacity style={{ alignSelf: "flex-end", marginBottom: 24 }}>
+                    <Text style={{ color: "#14b8a6", fontSize: 13 }}>Quên mật khẩu?</Text>
+                  </TouchableOpacity>
+                </Link>
+
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: isSubmitting ? "#0d9488" : "#14b8a6",
+                    borderRadius: 12, paddingVertical: 16, alignItems: "center",
+                  }}
+                  onPress={() => handleSubmit()}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text style={{ color: "#fff", fontWeight: "700", fontSize: 16 }}>Đăng nhập</Text>
+                  )}
+                </TouchableOpacity>
+              </>
             )}
-          </TouchableOpacity>
+          </Formik>
 
           <View style={{ flexDirection: "row", justifyContent: "center", marginTop: 32 }}>
             <Text style={{ color: "#64748b" }}>Chưa có tài khoản? </Text>

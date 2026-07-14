@@ -1,29 +1,35 @@
 import { useState } from "react";
 import {
-  View, Text, TextInput, TouchableOpacity,
+  View, Text, TouchableOpacity,
   KeyboardAvoidingView, Platform, ActivityIndicator,
 } from "react-native";
 import { router } from "expo-router";
+import { Formik, type FormikHelpers } from "formik";
 import { useAuth } from "../../hooks/useAuth";
-import { useUIStore } from "../../store/uiStore";
+import { FormField } from "../../components/ui/FormField";
+import { forgotPasswordSchema } from "../../utils/validationSchemas";
+import { getFriendlyAuthErrorMessage } from "../../utils/firebaseErrors";
+
+interface ForgotPasswordValues {
+  email: string;
+}
 
 export default function ForgotPasswordScreen() {
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [sent, setSent] = useState(false);
   const { resetPassword } = useAuth();
-  const { showToast } = useUIStore();
+  const [sent, setSent] = useState(false);
+  const [sentEmail, setSentEmail] = useState("");
 
-  const handleReset = async () => {
-    if (!email.trim()) { showToast("Vui lòng nhập email", "error"); return; }
-    setLoading(true);
+  const handleReset = async (
+    values: ForgotPasswordValues,
+    { setErrors, setFieldTouched }: FormikHelpers<ForgotPasswordValues>
+  ) => {
     try {
-      await resetPassword(email.trim().toLowerCase());
+      await resetPassword(values.email.trim().toLowerCase());
+      setSentEmail(values.email.trim());
       setSent(true);
     } catch (e: any) {
-      showToast(e?.message ?? "Không thể gửi email. Vui lòng thử lại", "error");
-    } finally {
-      setLoading(false);
+      setErrors({ email: getFriendlyAuthErrorMessage(e) });
+      setFieldTouched("email", true, false);
     }
   };
 
@@ -35,7 +41,7 @@ export default function ForgotPasswordScreen() {
           Kiểm tra hộp thư của bạn
         </Text>
         <Text style={{ color: "#64748b", fontSize: 15, textAlign: "center", marginBottom: 32 }}>
-          Chúng tôi đã gửi liên kết đặt lại mật khẩu tới {email}
+          Chúng tôi đã gửi liên kết đặt lại mật khẩu tới {sentEmail}
         </Text>
         <TouchableOpacity
           style={{ backgroundColor: "#ffffff", borderWidth: 1, borderColor: "#e7e9ee", borderRadius: 12, paddingVertical: 14, paddingHorizontal: 32 }}
@@ -62,33 +68,43 @@ export default function ForgotPasswordScreen() {
         <Text style={{ color: "#64748b", fontSize: 15, marginBottom: 32 }}>
           Nhập email của bạn, chúng tôi sẽ gửi liên kết đặt lại mật khẩu.
         </Text>
-        <TextInput
-          style={{
-            backgroundColor: "#ffffff", borderWidth: 1, borderColor: "#e7e9ee",
-            borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14,
-            color: "#0f172a", fontSize: 15, marginBottom: 16,
-          }}
-          placeholder="you@example.com"
-          placeholderTextColor="#94a3b8"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-        <TouchableOpacity
-          style={{
-            backgroundColor: loading ? "#0d9488" : "#14b8a6",
-            borderRadius: 12, paddingVertical: 16, alignItems: "center",
-          }}
-          onPress={handleReset}
-          disabled={loading}
+
+        <Formik<ForgotPasswordValues>
+          initialValues={{ email: "" }}
+          validationSchema={forgotPasswordSchema}
+          onSubmit={handleReset}
         >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={{ color: "#fff", fontWeight: "700", fontSize: 16 }}>Gửi liên kết đặt lại</Text>
+          {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting }) => (
+            <>
+              <FormField
+                label="Email"
+                placeholder="you@example.com"
+                value={values.email}
+                onChangeText={handleChange("email")}
+                onBlur={handleBlur("email")}
+                error={errors.email}
+                touched={touched.email}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+
+              <TouchableOpacity
+                style={{
+                  backgroundColor: isSubmitting ? "#0d9488" : "#14b8a6",
+                  borderRadius: 12, paddingVertical: 16, alignItems: "center",
+                }}
+                onPress={() => handleSubmit()}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={{ color: "#fff", fontWeight: "700", fontSize: 16 }}>Gửi liên kết đặt lại</Text>
+                )}
+              </TouchableOpacity>
+            </>
           )}
-        </TouchableOpacity>
+        </Formik>
       </View>
     </KeyboardAvoidingView>
   );

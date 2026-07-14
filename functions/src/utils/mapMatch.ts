@@ -32,11 +32,24 @@ function mapStatus(fdStatus: FDMatch["status"]): OurMatchStatus {
 }
 
 function mapTeamSnapshot(team: FDTeam) {
+  // Với các trận vòng loại/knockout mà đối thủ chưa được xác định (phụ
+  // thuộc kết quả vòng trước), football-data.org trả về team gần như
+  // rỗng hoàn toàn (id/name/crest đều null/undefined). Không xử lý riêng
+  // sẽ ra "team-undefined" và tên/ảnh trống -> hiện dấu "?" trên app.
+  if (!team || !team.id) {
+    return {
+      id: "team-tbd",
+      name: "Chưa xác định",
+      shortName: "Chưa xác định",
+      tla: "TBD",
+      crest: "",
+    };
+  }
   return {
     id: `team-${team.id}`,
-    name: team.name,
-    shortName: team.shortName ?? team.name,
-    tla: team.tla ?? team.shortName?.slice(0, 3).toUpperCase() ?? "???",
+    name: team.name || "Chưa xác định",
+    shortName: team.shortName || team.name || "TBD",
+    tla: team.tla || team.shortName?.slice(0, 3).toUpperCase() || "TBD",
     crest: team.crest ?? "",
   };
 }

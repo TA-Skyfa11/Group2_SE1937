@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {
   View, Text, ScrollView, TouchableOpacity,
-  ActivityIndicator, RefreshControl, Image,
+  ActivityIndicator, RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, router } from "expo-router";
@@ -11,6 +11,7 @@ import { useFavorites } from "../../hooks/useFavorites";
 import { PredictionSheet } from "../../components/prediction/PredictionSheet";
 import { OddsButton } from "../../components/prediction/OddsButton";
 import { MatchSkeleton } from "../../components/skeleton/MatchSkeleton";
+import { TeamCrest } from "../../components/common/TeamCrest";
 import { formatDateFull } from "../../utils/dateUtils";
 import type { Match, MatchEvent, TeamSnapshot } from "../../types/match.types";
 
@@ -26,30 +27,7 @@ const STATUS_COLOR: Record<string, string> = {
 };
 
 function BigCrest({ team, size = 64 }: { team: TeamSnapshot; size?: number }) {
-  if (!team.crest) {
-    return (
-      <View
-        style={{
-          width: size, height: size, borderRadius: size / 2, backgroundColor: "#ffffff",
-          borderWidth: 1, borderColor: "#e7e9ee", alignItems: "center", justifyContent: "center",
-        }}
-      >
-        <Text style={{ fontSize: size * 0.36, fontWeight: "700", color: "#94a3b8" }}>
-          {team.tla?.slice(0, 2) || "?"}
-        </Text>
-      </View>
-    );
-  }
-  return (
-    <View
-      style={{
-        width: size, height: size, borderRadius: size / 2, backgroundColor: "#ffffff",
-        borderWidth: 1, borderColor: "#e7e9ee", alignItems: "center", justifyContent: "center",
-      }}
-    >
-      <Image source={{ uri: team.crest }} style={{ width: size * 0.7, height: size * 0.7 }} resizeMode="contain" />
-    </View>
-  );
+  return <TeamCrest team={team} size={size} bordered />;
 }
 
 /* ── Score Header ─────────────────────────────────────────── */

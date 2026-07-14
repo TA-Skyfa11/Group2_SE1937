@@ -1,56 +1,51 @@
-import { useState } from "react";
 import {
-  View, Text, TextInput, TouchableOpacity,
+  View, Text, TouchableOpacity,
   KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator,
 } from "react-native";
 import { Link, router } from "expo-router";
+import { Formik, type FormikHelpers } from "formik";
 import { useAuth } from "../../hooks/useAuth";
 import { useUIStore } from "../../store/uiStore";
+import { FormField } from "../../components/ui/FormField";
+import { registerSchema } from "../../utils/validationSchemas";
+import { getFriendlyAuthErrorMessage } from "../../utils/firebaseErrors";
+
+interface RegisterValues {
+  displayName: string;
+  username: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
 
 export default function RegisterScreen() {
-  const [form, setForm] = useState({
-    displayName: "", username: "", email: "", password: "", confirmPassword: "",
-  });
-  const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const { showToast } = useUIStore();
 
-  const update = (field: keyof typeof form) => (v: string) =>
-    setForm((p) => ({ ...p, [field]: v }));
-
-  const handleRegister = async () => {
-    const { email, username, displayName, password, confirmPassword } = form;
-    if (!email || !username || !displayName || !password) {
-      showToast("Vui lòng điền đầy đủ thông tin", "error"); return;
-    }
-    if (password !== confirmPassword) {
-      showToast("Mật khẩu không khớp", "error"); return;
-    }
-    if (password.length < 6) {
-      showToast("Mật khẩu phải có ít nhất 6 ký tự", "error"); return;
-    }
-    if (username.length < 3) {
-      showToast("Tên đăng nhập phải có ít nhất 3 ký tự", "error"); return;
-    }
-    setLoading(true);
+  const handleRegister = async (
+    values: RegisterValues,
+    { setErrors, setFieldTouched }: FormikHelpers<RegisterValues>
+  ) => {
     try {
-      await register({ email: email.trim().toLowerCase(), username, displayName, password });
+      await register({
+        email: values.email.trim().toLowerCase(),
+        username: values.username.trim(),
+        displayName: values.displayName.trim(),
+        password: values.password,
+      });
       showToast("Chào mừng! Bạn nhận được 1000 coin 🪙", "success");
       router.replace("/(tabs)" as any);
     } catch (e: any) {
-      showToast(e?.message ?? "Đăng ký thất bại", "error");
-    } finally {
-      setLoading(false);
+      // Lỗi liên quan đăng ký luôn gắn vào field email — đó là field duy
+      // nhất mà Firebase Auth thực sự kiểm tra (email đã tồn tại, sai
+      // định dạng...). Không hiện Toast với message kỹ thuật của Firebase
+      // nữa — chỉ hiện lỗi ngay dưới field, giống các field lỗi khác do
+      // Yup validate.
+      const message = getFriendlyAuthErrorMessage(e);
+      setErrors({ email: message });
+      setFieldTouched("email", true, false);
     }
   };
-
-  const fields = [
-    { label: "Tên hiển thị", field: "displayName", placeholder: "Tên của bạn", keyboard: "default" },
-    { label: "Tên đăng nhập", field: "username", placeholder: "ten_dang_nhap", keyboard: "default" },
-    { label: "Email", field: "email", placeholder: "you@example.com", keyboard: "email-address" },
-    { label: "Mật khẩu", field: "password", placeholder: "••••••••", secure: true },
-    { label: "Xác nhận mật khẩu", field: "confirmPassword", placeholder: "••••••••", secure: true },
-  ] as const;
 
   return (
     <KeyboardAvoidingView
@@ -68,42 +63,89 @@ export default function RegisterScreen() {
             </Text>
           </View>
 
-          {fields.map(({ label, field, placeholder, keyboard, secure }) => (
-            <View key={field} style={{ marginBottom: 16 }}>
-              <Text style={{ color: "#64748b", fontSize: 13, marginBottom: 8, fontWeight: "500" }}>
-                {label}
-              </Text>
-              <TextInput
-                style={{
-                  backgroundColor: "#ffffff", borderWidth: 1, borderColor: "#e7e9ee",
-                  borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14,
-                  color: "#0f172a", fontSize: 15,
-                }}
-                placeholder={placeholder}
-                placeholderTextColor="#94a3b8"
-                value={form[field]}
-                onChangeText={update(field)}
-                keyboardType={(keyboard as any) ?? "default"}
-                secureTextEntry={secure}
-                autoCapitalize={field === "email" ? "none" : field === "username" ? "none" : "words"}
-              />
-            </View>
-          ))}
-
-          <TouchableOpacity
-            style={{
-              backgroundColor: loading ? "#0d9488" : "#14b8a6",
-              borderRadius: 12, paddingVertical: 16, alignItems: "center", marginTop: 8,
+          <Formik<RegisterValues>
+            initialValues={{
+              displayName: "", username: "", email: "", password: "", confirmPassword: "",
             }}
-            onPress={handleRegister}
-            disabled={loading}
+            validationSchema={registerSchema}
+            onSubmit={handleRegister}
           >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={{ color: "#fff", fontWeight: "700", fontSize: 16 }}>Tạo tài khoản</Text>
+            {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting }) => (
+              <>
+                <FormField
+                  label="Tên hiển thị"
+                  placeholder="Tên của bạn"
+                  value={values.displayName}
+                  onChangeText={handleChange("displayName")}
+                  onBlur={handleBlur("displayName")}
+                  error={errors.displayName}
+                  touched={touched.displayName}
+                  autoCapitalize="words"
+                />
+
+                <FormField
+                  label="Tên đăng nhập"
+                  placeholder="ten_dang_nhap"
+                  value={values.username}
+                  onChangeText={handleChange("username")}
+                  onBlur={handleBlur("username")}
+                  error={errors.username}
+                  touched={touched.username}
+                  autoCapitalize="none"
+                />
+
+                <FormField
+                  label="Email"
+                  placeholder="you@example.com"
+                  value={values.email}
+                  onChangeText={handleChange("email")}
+                  onBlur={handleBlur("email")}
+                  error={errors.email}
+                  touched={touched.email}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                />
+
+                <FormField
+                  label="Mật khẩu"
+                  placeholder="••••••••"
+                  value={values.password}
+                  onChangeText={handleChange("password")}
+                  onBlur={handleBlur("password")}
+                  error={errors.password}
+                  touched={touched.password}
+                  secureToggle
+                />
+
+                <FormField
+                  label="Xác nhận mật khẩu"
+                  placeholder="••••••••"
+                  value={values.confirmPassword}
+                  onChangeText={handleChange("confirmPassword")}
+                  onBlur={handleBlur("confirmPassword")}
+                  error={errors.confirmPassword}
+                  touched={touched.confirmPassword}
+                  secureToggle
+                />
+
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: isSubmitting ? "#0d9488" : "#14b8a6",
+                    borderRadius: 12, paddingVertical: 16, alignItems: "center", marginTop: 8,
+                  }}
+                  onPress={() => handleSubmit()}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text style={{ color: "#fff", fontWeight: "700", fontSize: 16 }}>Tạo tài khoản</Text>
+                  )}
+                </TouchableOpacity>
+              </>
             )}
-          </TouchableOpacity>
+          </Formik>
 
           <View style={{ flexDirection: "row", justifyContent: "center", marginTop: 24 }}>
             <Text style={{ color: "#64748b" }}>Đã có tài khoản? </Text>

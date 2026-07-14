@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Image } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, router } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
@@ -8,6 +8,7 @@ import { QUERY_KEYS } from "../../constants/queryKeys";
 import { useFavorites } from "../../hooks/useFavorites";
 import { MatchCard } from "../../components/match/MatchCard";
 import { EmptyState } from "../../components/ui/EmptyState";
+import { TeamCrest } from "../../components/common/TeamCrest";
 
 export default function TeamDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -48,14 +49,8 @@ export default function TeamDetailScreen() {
           <>
             {/* Team header */}
             <View style={{ alignItems: "center", padding: 24 }}>
-              <View style={{ width: 88, height: 88, borderRadius: 44, backgroundColor: "#ffffff", borderWidth: 1, borderColor: "#e7e9ee", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
-                {team.crest ? (
-                  <Image source={{ uri: team.crest }} style={{ width: 60, height: 60 }} resizeMode="contain" />
-                ) : (
-                  <Text style={{ fontSize: 28, fontWeight: "700", color: "#94a3b8" }}>
-                    {team.tla?.slice(0, 2) || "?"}
-                  </Text>
-                )}
+              <View style={{ marginBottom: 16 }}>
+                <TeamCrest team={team} size={88} bordered />
               </View>
               <Text style={{ color: "#0f172a", fontSize: 24, fontWeight: "700" }}>{team.name}</Text>
               <Text style={{ color: "#64748b", fontSize: 14, marginTop: 4 }}>{team.country}</Text>
